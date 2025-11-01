@@ -1,13 +1,36 @@
-// TODO: Import Wagmi hooks
-// import { useAccount, useBalance, useNetwork } from 'wagmi';
+import { useAccount, useBalance, useChainId, useSwitchChain } from 'wagmi'
+import { base, baseSepolia } from 'viem/chains'
+import { useAppKit } from '@reown/appkit/react'
 
 export function useWallet() {
-  // TODO: Get connected wallet address
-  // TODO: Get wallet balance
-  // TODO: Check if on correct network (Base)
-  // TODO: Add network switching functionality
+  const { address, isConnected, isConnecting } = useAccount()
+  const chainId = useChainId()
+  const { switchChain } = useSwitchChain()
+  const { open } = useAppKit()
+  
+  const { data: balance } = useBalance({
+    address,
+  })
+
+  const isOnBase = chainId === base.id || chainId === baseSepolia.id
+  
+  const switchToBase = () => {
+    switchChain({ chainId: base.id })
+  }
+
+  const switchToBaseSepolia = () => {
+    switchChain({ chainId: baseSepolia.id })
+  }
 
   return {
-    // Wallet state and functions will go here
-  };
+    address,
+    isConnected,
+    isConnecting,
+    balance,
+    chainId,
+    isOnBase,
+    switchToBase,
+    switchToBaseSepolia,
+    openConnectModal: open,
+  }
 }

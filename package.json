@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Event ticketing platform built on Base blockchain with WalletConnect integration",
   "private": true,
+  "packageManager": "npm@11.6.0",
   "workspaces": [
     "packages/*",
     "apps/*"
@@ -16,6 +17,21 @@
     "contracts:compile": "cd packages/contracts && npm run compile",
     "contracts:deploy": "cd packages/contracts && npm run deploy",
     "contracts:test": "cd packages/contracts && npm run test"
+  },
+  "dependencies": {
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@reown/appkit": "^1.0.0",
+    "@reown/appkit-adapter-wagmi": "^1.0.0",
+    "wagmi": "^2.12.0",
+    "viem": "^2.21.0",
+    "@tanstack/react-query": "^5.0.0",
+    "zustand": "^4.4.0",
+    "framer-motion": "^11.0.0",
+    "lucide-react": "^0.400.0",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^2.0.0"
   },
   "devDependencies": {
     "turbo": "^2.0.0",
