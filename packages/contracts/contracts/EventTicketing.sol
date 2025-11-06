@@ -99,6 +99,14 @@ contract EventTicketing is ERC721, ERC721URIStorage, AccessControl, ReentrancyGu
     mapping(address => uint256[]) public userTickets;
     mapping(address => uint256[]) public organizerEvents;
 
+    // Anti-bot and rate limiting
+    mapping(address => uint256) public lastPurchaseTime; // Prevent rapid purchases
+    mapping(address => uint256) public purchaseCount; // Track purchases per address
+    mapping(address => uint256) public lastPurchaseResetTime; // Reset window
+    uint256 public constant PURCHASE_COOLDOWN = 10 seconds; // Minimum time between purchases
+    uint256 public constant MAX_PURCHASES_PER_WINDOW = 5; // Max purchases per hour
+    uint256 public constant RATE_LIMIT_WINDOW = 1 hours;
+
     constructor() ERC721("EventTicket", "ETKT") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(ORGANIZER_ROLE, msg.sender);
@@ -186,6 +194,24 @@ contract EventTicketing is ERC721, ERC721URIStorage, AccessControl, ReentrancyGu
         require(!hasTicket[eventId][msg.sender], "Already has ticket");
         require(msg.value >= eventData.ticketPrice, "Insufficient payment");
 
+        // Anti-bot rate limiting
+        require(
+            block.timestamp >= lastPurchaseTime[msg.sender] + PURCHASE_COOLDOWN,
+            "Purchase cooldown active"
+        );
+
+        // Check purchase count within window
+        if (block.timestamp > lastPurchaseResetTime[msg.sender] + RATE_LIMIT_WINDOW) {
+            // Reset window
+            purchaseCount[msg.sender] = 0;
+            lastPurchaseResetTime[msg.sender] = block.timestamp;
+        }
+
+        require(
+            purchaseCount[msg.sender] < MAX_PURCHASES_PER_WINDOW,
+            "Purchase limit exceeded"
+        );
+
         uint256 ticketId = _ticketIdCounter.current();
         _ticketIdCounter.increment();
 
@@ -205,6 +231,10 @@ contract EventTicketing is ERC721, ERC721URIStorage, AccessControl, ReentrancyGu
         eventData.ticketsSold++;
         hasTicket[eventId][msg.sender] = true;
         userTickets[msg.sender].push(ticketId);
+
+        // Update rate limiting trackers
+        lastPurchaseTime[msg.sender] = block.timestamp;
+        purchaseCount[msg.sender]++;
 
         // Remove from waitlist if user was on it
         _removeFromWaitlist(eventId, msg.sender);
