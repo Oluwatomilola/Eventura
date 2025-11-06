@@ -1,14 +1,28 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useAccount, usePublicClient } from 'wagmi'
+import dynamic from 'next/dynamic'
 import { motion } from 'framer-motion'
 import { Calendar as CalendarIcon, Wallet, AlertCircle, Home, Sparkles } from 'lucide-react'
-import { EventCalendar } from '@/components/EventCalendar'
 import { ConnectButton } from '@/components/ConnectButton'
 import type { EventWithMetadata } from '@/types/multilang-event'
 import { fetchEventMetadata, detectUserLanguage } from '@/utils/multilang'
 import { sortEventsByDate } from '@/utils/calendar'
+
+// Code-split EventCalendar component for better performance
+// Only loaded when user is connected and ready to view events
+const EventCalendar = dynamic(
+  () => import('@/components/EventCalendar').then(mod => ({ default: mod.EventCalendar })),
+  {
+    loading: () => (
+      <div className="flex justify-center items-center py-20">
+        <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    ),
+    ssr: false
+  }
+)
 
 // Import contract ABI (will need to be added)
 // TODO: Update with actual deployed contract address on Base L2

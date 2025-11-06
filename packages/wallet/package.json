@@ -12,8 +12,8 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@walletconnect/modal": "^2.6.0",
-    "@web3modal/wagmi": "^3.5.0",
+    "@reown/appkit": "^1.8.13",
+    "@reown/appkit-adapter-wagmi": "^1.8.13",
     "wagmi": "^2.0.0",
     "viem": "^2.0.0"
   },
