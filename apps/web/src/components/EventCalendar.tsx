@@ -5,6 +5,7 @@ import { Calendar as BigCalendar, momentLocalizer, View, SlotInfo } from 'react-
 import moment from 'moment'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
 import { Download, ExternalLink, X, Calendar as CalendarIcon, Filter } from 'lucide-react'
 import type { EventWithMetadata, LanguageCode } from '@/types/multilang-event'
 import { getTranslation, detectUserLanguage } from '@/utils/multilang'
@@ -324,12 +325,11 @@ function EventDetailModal({
 
       {/* Cover Image */}
       {event.metadata.media?.coverImage && (
-        <img
-          src={event.metadata.media.coverImage.replace(
-            'ipfs://',
-            'https://ipfs.io/ipfs/'
-          )}
+        <Image
+          src={event.metadata.media.coverImage.replace('ipfs://', 'https://ipfs.io/ipfs/')}
           alt={translation.name}
+          width={1200}
+          height={400}
           className="w-full h-48 object-cover rounded-lg mb-6"
         />
       )}

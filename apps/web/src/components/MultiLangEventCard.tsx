@@ -1,7 +1,8 @@
-'use client'
+ 'use client'
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 import { Calendar, MapPin, Users, Globe } from 'lucide-react'
 import type { EventWithMetadata, LanguageCode } from '@/types/multilang-event'
 import { SUPPORTED_LANGUAGES } from '@/types/multilang-event'
@@ -44,11 +45,14 @@ export function MultiLangEventCard({
     >
       {/* Cover Image */}
       {event.metadata.media?.coverImage && (
-        <div className="relative h-48 overflow-hidden">
-          <img
+        <div className="relative w-full aspect-[16/9] sm:aspect-[2/1] lg:aspect-[3/1] overflow-hidden">
+          <Image
             src={event.metadata.media.coverImage.replace('ipfs://', 'https://ipfs.io/ipfs/')}
             alt={translation.name}
-            className="w-full h-full object-cover"
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority={true}
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent" />
 
@@ -71,14 +75,14 @@ export function MultiLangEventCard({
       )}
 
       {/* Content */}
-      <div className="p-6" dir={textDirection}>
+      <div className="p-4 sm:p-6" dir={textDirection}>
         {/* Title */}
-        <h3 className="text-2xl font-bold text-white mb-3">
+        <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 sm:mb-3">
           {translation.name}
         </h3>
 
         {/* Description */}
-        <p className="text-gray-300 mb-4 line-clamp-3">
+        <p className="text-sm sm:text-base text-gray-300 mb-3 sm:mb-4 line-clamp-2 sm:line-clamp-3">
           {translation.description}
         </p>
 
@@ -155,21 +159,25 @@ export function MultiLangEventCardCompact({
   const textDirection = getTextDirection(selectedLanguage)
 
   return (
-    <div className="flex gap-4 p-4 bg-white/5 hover:bg-white/10 rounded-lg transition-colors" dir={textDirection}>
+    <div className="flex flex-col xs:flex-row gap-3 xs:gap-4 p-3 xs:p-4 bg-white/5 hover:bg-white/10 rounded-lg transition-colors" dir={textDirection}>
       {event.metadata.media?.coverImage && (
-        <img
-          src={event.metadata.media.coverImage.replace('ipfs://', 'https://ipfs.io/ipfs/')}
-          alt={translation.name}
-          className="w-20 h-20 object-cover rounded-lg"
-        />
+        <div className="relative w-full xs:w-20 aspect-video xs:aspect-square">
+          <Image
+            src={event.metadata.media.coverImage.replace('ipfs://', 'https://ipfs.io/ipfs/')}
+            alt={translation.name}
+            fill
+            sizes="(max-width: 640px) 100vw, 80px"
+            className="object-cover rounded-lg"
+          />
+        </div>
       )}
 
-      <div className="flex-1">
-        <h4 className="text-white font-semibold mb-1">{translation.name}</h4>
+      <div className="flex-1 min-w-0">
+        <h4 className="text-base xs:text-lg text-white font-semibold mb-1 truncate">{translation.name}</h4>
         <p className="text-gray-400 text-sm mb-2 line-clamp-1">{translation.location}</p>
-        <div className="flex items-center gap-4 text-xs text-gray-400">
-          <span>{formatEventDate(event.startTime, selectedLanguage)}</span>
-          <span>{formatPrice(event.ticketPrice, selectedLanguage)}</span>
+        <div className="flex flex-wrap items-center gap-2 xs:gap-4 text-xs text-gray-400">
+          <span className="truncate">{formatEventDate(event.startTime, selectedLanguage)}</span>
+          <span className="truncate">{formatPrice(event.ticketPrice, selectedLanguage)}</span>
         </div>
       </div>
     </div>

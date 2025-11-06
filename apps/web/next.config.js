@@ -2,6 +2,15 @@
 const nextConfig = {
   reactStrictMode: true,
   transpilePackages: ['@base-ticketing/contracts'],
+  images: {
+    // Allow common IPFS gateways and related remote patterns
+    domains: ['ipfs.io', 'gateway.pinata.cloud', 'ipfs.infura.io'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'ipfs.io', pathname: '/**' },
+      { protocol: 'https', hostname: 'gateway.pinata.cloud', pathname: '/**' },
+      { protocol: 'https', hostname: '**.ipfs.dweb.link', pathname: '/**' },
+    ],
+  },
   webpack: (config, { isServer }) => {
     // Fallbacks for node modules not available in browser
     config.resolve.fallback = {
