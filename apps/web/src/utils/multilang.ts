@@ -16,17 +16,17 @@ export function getTranslation(
 ): EventTranslation {
   // Try preferred language
   if (metadata.translations[preferredLanguage]) {
-    return metadata.translations[preferredLanguage];
+    return metadata.translations[preferredLanguage]!;
   }
 
   // Fall back to default language
   if (metadata.translations[metadata.defaultLanguage]) {
-    return metadata.translations[metadata.defaultLanguage];
+    return metadata.translations[metadata.defaultLanguage]!;
   }
 
   // Fall back to first available translation
   const firstLang = Object.keys(metadata.translations)[0] as LanguageCode;
-  return metadata.translations[firstLang];
+  return metadata.translations[firstLang]!;
 }
 
 /**

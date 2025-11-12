@@ -33,7 +33,7 @@ export interface EventOrganizer {
 export interface EventMetadata {
   version: string;
   defaultLanguage: LanguageCode;
-  translations: Record<LanguageCode, EventTranslation>;
+  translations: Partial<Record<LanguageCode, EventTranslation>>;
   media?: EventMedia;
   organizer?: EventOrganizer;
 }

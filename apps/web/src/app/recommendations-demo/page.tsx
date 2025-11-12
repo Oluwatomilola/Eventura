@@ -7,13 +7,15 @@ import { useAccount } from 'wagmi'
 import { RecommendedEvents } from '@/components/RecommendedEvents'
 import { SimilarEvents } from '@/components/SimilarEvents'
 import { sampleEvents } from '@/data/sampleEvents'
+import { getTranslation } from '@/utils/multilang'
+import type { EventWithMetadata } from '@/types/multilang-event'
 import {
   getStoredInteractions,
   getInteractionStats,
   clearInteractions,
   trackInteraction,
-  type UserInteraction,
 } from '@/lib/userTracking'
+import type { UserInteraction } from '@/lib/recommendations'
 import { buildUserProfile, clearRecommendationCache } from '@/lib/recommendations'
 
 export default function RecommendationsDemoPage() {
@@ -45,19 +47,21 @@ export default function RecommendationsDemoPage() {
     eventId?: string
   ) => {
     const event = eventId
-      ? sampleEvents.find((e) => e.id === eventId)
+      ? sampleEvents.find((e) => e.id.toString() === eventId)
       : sampleEvents[Math.floor(Math.random() * sampleEvents.length)]
 
     if (!event) return
 
+    const translation = getTranslation(event.metadata, 'en')
+
     trackInteraction({
       userId: address || 'anonymous',
-      eventId: event.id || '',
+      eventId: event.id.toString(),
       type,
       metadata: {
-        category: event.metadata?.category,
-        price: event.metadata?.price,
-        location: event.metadata?.location,
+        category: translation.category,
+        price: Number(event.ticketPrice) / 1e18,
+        location: translation.location,
       },
     })
 
@@ -228,19 +232,22 @@ export default function RecommendationsDemoPage() {
               Select an event below to see similar events based on content similarity:
             </p>
             <div className="flex flex-wrap gap-2">
-              {sampleEvents.slice(0, 5).map((event) => (
-                <button
-                  key={event.id}
-                  onClick={() => setSelectedEvent(event)}
-                  className={`px-4 py-2 rounded-lg transition-colors ${
-                    selectedEvent.id === event.id
-                      ? 'bg-blue-500 text-white'
-                      : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                  }`}
-                >
-                  {event.metadata?.title}
-                </button>
-              ))}
+              {sampleEvents.slice(0, 5).map((event) => {
+                const translation = getTranslation(event.metadata, 'en')
+                return (
+                  <button
+                    key={event.id.toString()}
+                    onClick={() => setSelectedEvent(event)}
+                    className={`px-4 py-2 rounded-lg transition-colors ${
+                      selectedEvent.id === event.id
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                    }`}
+                  >
+                    {translation.name}
+                  </button>
+                )
+              })}
             </div>
           </div>
 
