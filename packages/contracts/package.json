@@ -11,7 +11,8 @@
     "deploy:mainnet": "hardhat run scripts/deploy.ts --network base-mainnet",
     "verify": "hardhat verify",
     "clean": "hardhat clean",
-    "coverage": "hardhat coverage"
+    "coverage": "hardhat coverage",
+    "type-check": "tsc --noEmit"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
