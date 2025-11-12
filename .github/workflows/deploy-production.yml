@@ -86,7 +86,7 @@ jobs:
           BASESCAN_API_KEY: ${{ secrets.BASESCAN_API_KEY }}
 
       - name: Save deployment artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: production-deployment
           path: |
