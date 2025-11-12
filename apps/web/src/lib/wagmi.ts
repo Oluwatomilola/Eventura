@@ -5,7 +5,11 @@ import { WagmiProvider } from 'wagmi'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 // 1. Get projectId from https://cloud.reown.com
-const projectId = '982f175981feaa4270a11ee31a1231d6'
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!
+
+if (!projectId) {
+  throw new Error('NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is not defined in environment variables')
+}
 
 // 2. Set up Wagmi adapter
 const wagmiAdapter = new WagmiAdapter({
