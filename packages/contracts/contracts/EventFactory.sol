@@ -13,6 +13,7 @@ contract EventFactory is AccessControl {
     using Counters for Counters.Counter;
 
     bytes32 public constant ORGANIZER_ROLE = keccak256("ORGANIZER_ROLE");
+    bytes32 public constant TICKETING_ROLE = keccak256("TICKETING_ROLE");
 
     Counters.Counter private _eventIdCounter;
 
@@ -59,6 +60,7 @@ contract EventFactory is AccessControl {
     constructor() {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(ORGANIZER_ROLE, msg.sender);
+        _grantRole(TICKETING_ROLE, msg.sender);
     }
 
     /**
@@ -184,7 +186,7 @@ contract EventFactory is AccessControl {
      * @param eventId ID of the event
      * @param amount Number of tickets sold
      */
-    function incrementTicketsSold(uint256 eventId, uint256 amount) external {
+    function incrementTicketsSold(uint256 eventId, uint256 amount) external onlyRole(TICKETING_ROLE) {
         Event storage eventData = events[eventId];
         require(eventData.ticketsSold + amount <= eventData.maxTickets, "Exceeds max tickets");
         eventData.ticketsSold += amount;
