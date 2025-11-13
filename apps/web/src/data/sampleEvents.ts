@@ -3,6 +3,10 @@
  *
  * This file contains mock event data to demonstrate the recommendation system
  * In production, this would be fetched from the Base blockchain via Reown/WalletConnect
+ *
+ * NOTE: Cover images use Unsplash URLs which require proper Next.js configuration.
+ * Ensure images.unsplash.com is configured in next.config.js remotePatterns
+ * to allow these images to load properly in the EventCard component.
  */
 
 import type { EventWithMetadata } from '@/types/multilang-event'

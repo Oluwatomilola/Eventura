@@ -12,11 +12,14 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
   images: {
-    // Allow common IPFS gateways and related remote patterns
-    domains: ['ipfs.io', 'gateway.pinata.cloud', 'ipfs.infura.io'],
+    // Allow external image sources using Next.js 14+ remotePatterns
     remotePatterns: [
+      // Unsplash images for sample events
+      { protocol: 'https', hostname: 'images.unsplash.com', pathname: '/**' },
+      // IPFS gateways for decentralized storage
       { protocol: 'https', hostname: 'ipfs.io', pathname: '/**' },
       { protocol: 'https', hostname: 'gateway.pinata.cloud', pathname: '/**' },
+      { protocol: 'https', hostname: 'ipfs.infura.io', pathname: '/**' },
       { protocol: 'https', hostname: '**.ipfs.dweb.link', pathname: '/**' },
     ],
   },
