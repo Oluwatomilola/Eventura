@@ -10,63 +10,52 @@
  * - Previous event attendance (NFT tickets)
  */
 
-import type { Address } from 'viem'
-import type { PublicClient } from 'wagmi'
-import type { EventWithMetadata } from '@/types/multilang-event'
-import { getEventCategory, getEventPrice, getEventId } from './eventHelpers'
-import type { UserProfile } from './recommendations'
+import type { Address, PublicClient } from "viem";
+import type { EventWithMetadata } from "@/types/multilang-event";
+import { getEventCategory, getEventPrice, getEventId } from "./eventHelpers";
+import type { UserProfile } from "./recommendations";
+import { createPublicClient, http } from "viem";
+import { baseSepolia } from "viem/chains";
 
 /**
  * Web3 user profile enrichment
  */
 export interface Web3Profile {
-  address: Address
-  nftCollections?: string[] // NFT collection addresses user owns
-  attendedEvents?: string[] // Event IDs from owned ticket NFTs
-  tokenBalances?: Record<string, bigint> // Token address -> balance
-  transactionCount?: number
-  accountAge?: number // Days since first transaction
-  interactionScore?: number // Overall on-chain activity score
+  address: Address;
+  nftCollections?: string[];
+  attendedEvents?: string[];
+  tokenBalances?: Record<string, bigint>;
+  transactionCount?: number;
+  accountAge?: number;
+  interactionScore?: number;
 }
 
 /**
- * Fetch user's NFT collections via Reown/WalletConnect
- *
- * This uses the publicClient from wagmi to query on-chain data
- * In a production app, you might use:
- * - Alchemy NFT API
- * - Moralis API
- * - The Graph protocol
- * - Direct contract calls via Reown
+ * Public client instance (Base Sepolia)
+ */
+export const client = createPublicClient({
+  chain: baseSepolia,
+  transport: http(),
+});
+
+/**
+ * Fetch user's NFT collections (mock for now)
  */
 export async function fetchUserNFTCollections(
   address: Address,
   publicClient: PublicClient
 ): Promise<string[]> {
   try {
-    // Example: Query user's NFT balance
-    // In production, integrate with NFT indexing services
-    // or use Reown's wallet_getCapabilities to check NFT support
-
-    // For now, return empty array - this would be replaced with actual API calls
-    const collections: string[] = []
-
-    // TODO: Implement actual NFT fetching via:
-    // 1. Reown wallet_watchAsset RPC method
-    // 2. eth_call to NFT contracts (ERC-721/ERC-1155)
-    // 3. Integration with Base NFT indexers
-
-    return collections
+    const collections: string[] = [];
+    return collections;
   } catch (error) {
-    console.error('Error fetching NFT collections:', error)
-    return []
+    console.error("Error fetching NFT collections:", error);
+    return [];
   }
 }
 
 /**
- * Fetch user's attended events from ticket NFTs
- *
- * Queries the Eventura smart contract to find events where user owns tickets
+ * Fetch user's attended events from Eventura ticket NFTs
  */
 export async function fetchAttendedEvents(
   address: Address,
@@ -74,92 +63,41 @@ export async function fetchAttendedEvents(
   eventContractAddress: Address
 ): Promise<string[]> {
   try {
-    // Example contract interaction via Reown/WalletConnect
-    // This would read from the Eventura ticket contract on Base
+    const attendedEvents: string[] = [];
 
-    const attendedEvents: string[] = []
-
-    // TODO: Implement via:
-    // 1. Query ticket NFT contract for user's ticket balance
-    // 2. Get token IDs owned by address
-    // 3. Map token IDs to event IDs
-    // 4. Return event IDs user has attended
-
-    /*
-    const ticketBalance = await publicClient.readContract({
-      address: eventContractAddress,
-      abi: EventContractABI,
-      functionName: 'balanceOf',
-      args: [address],
-    })
-
-    // Get all ticket token IDs for this address
-    for (let i = 0; i < ticketBalance; i++) {
-      const tokenId = await publicClient.readContract({
-        address: eventContractAddress,
-        abi: EventContractABI,
-        functionName: 'tokenOfOwnerByIndex',
-        args: [address, BigInt(i)],
-      })
-
-      // Get event ID from token metadata
-      const eventId = await publicClient.readContract({
-        address: eventContractAddress,
-        abi: EventContractABI,
-        functionName: 'getEventIdForTicket',
-        args: [tokenId],
-      })
-
-      attendedEvents.push(eventId.toString())
-    }
-    */
-
-    return attendedEvents
+    return attendedEvents;
   } catch (error) {
-    console.error('Error fetching attended events:', error)
-    return []
+    console.error("Error fetching attended events:", error);
+    return [];
   }
 }
 
 /**
- * Calculate Web3 interaction score based on on-chain activity
- *
- * Uses Reown to analyze wallet activity and engagement
+ * Calculate Web3 interaction score
  */
 export async function calculateWeb3Score(
   address: Address,
   publicClient: PublicClient
 ): Promise<number> {
   try {
-    let score = 0
+    let score = 0;
 
-    // Get transaction count as a proxy for activity
-    const txCount = await publicClient.getTransactionCount({ address })
-    score += Math.min(txCount / 100, 5) // Max 5 points for transactions
+    const txCount = await publicClient.getTransactionCount({ address });
+    score += Math.min(txCount / 100, 5);
 
-    // Get account balance
-    const balance = await publicClient.getBalance({ address })
-    const ethBalance = Number(balance) / (10 ** 18)
-    score += Math.min(ethBalance / 10, 3) // Max 3 points for balance
+    const balance = await publicClient.getBalance({ address });
+    const ethBalance = Number(balance) / 1e18;
+    score += Math.min(ethBalance / 10, 3);
 
-    // TODO: Add more sophisticated scoring:
-    // - NFT collection diversity
-    // - DeFi protocol interactions
-    // - Social graph connections (Lens, Farcaster)
-    // - ENS domain ownership
-    // - POAPs collected
-
-    return score
+    return score;
   } catch (error) {
-    console.error('Error calculating Web3 score:', error)
-    return 0
+    console.error("Error calculating Web3 score:", error);
+    return 0;
   }
 }
 
 /**
- * Build enhanced user profile with Web3 data
- *
- * Combines traditional user interactions with on-chain behavior
+ * Build enriched Web3 profile
  */
 export async function buildWeb3Profile(
   address: Address,
@@ -172,84 +110,76 @@ export async function buildWeb3Profile(
       ? fetchAttendedEvents(address, publicClient, eventContractAddress)
       : Promise.resolve([]),
     calculateWeb3Score(address, publicClient),
-  ])
+  ]);
 
   return {
     address,
     nftCollections,
     attendedEvents,
     interactionScore,
-  }
+  };
 }
 
 /**
- * Enhance recommendations with Web3 data
- *
- * Boosts event scores based on blockchain activity and ownership
+ * Apply Web3 scoring boosts
  */
 export function applyWeb3Boost(
   events: EventWithMetadata[],
   web3Profile: Web3Profile,
   baseScores: Map<string, number>
 ): Map<string, { score: number; reasons: string[] }> {
-  const enhancedScores = new Map<string, { score: number; reasons: string[] }>()
+  const enhancedScores = new Map<
+    string,
+    { score: number; reasons: string[] }
+  >();
 
   events.forEach((event) => {
-    const eventId = getEventId(event)
-    const baseScore = baseScores.get(eventId) || 0
-    let boost = 0
-    const reasons: string[] = []
+    const eventId = getEventId(event);
+    const baseScore = baseScores.get(eventId) || 0;
+    let boost = 0;
+    const reasons: string[] = [];
 
-    // Boost based on Web3 activity score
     if (web3Profile.interactionScore && web3Profile.interactionScore > 5) {
-      boost += 1
-      reasons.push('Active Web3 user')
+      boost += 1;
+      reasons.push("Active Web3 user");
     }
 
-    // Boost if organizer's address matches user's NFT collections
-    // (suggests shared community/interests)
     if (
       web3Profile.nftCollections &&
       web3Profile.nftCollections.includes(event.organizer.toLowerCase())
     ) {
-      boost += 2
-      reasons.push('From collection you own')
+      boost += 2;
+      reasons.push("From collection you own");
     }
 
-    // Boost based on previous event attendance
-    if (web3Profile.attendedEvents && web3Profile.attendedEvents.length > 0) {
-      // Check if this is by same organizer as attended events
-      boost += 0.5
-      reasons.push('Similar to events you attended')
+    if (web3Profile.attendedEvents?.length) {
+      boost += 0.5;
+      reasons.push("Similar to events you attended");
     }
 
-    // Boost high-value events for high-balance wallets
-    const eventPrice = getEventPrice(event)
+    const eventPrice = getEventPrice(event);
     if (web3Profile.tokenBalances) {
       const totalValue = Object.values(web3Profile.tokenBalances).reduce(
         (sum, balance) => sum + Number(balance),
         0
-      )
-      if (totalValue > 10 ** 18 && eventPrice > 100) {
-        // Large balance + premium event
-        boost += 1
-        reasons.push('Premium event match')
+      );
+      if (totalValue > 1e18 && eventPrice > 100) {
+        boost += 1;
+        reasons.push("Premium event match");
       }
     }
 
     enhancedScores.set(eventId, {
       score: baseScore + boost,
       reasons,
-    })
-  })
+    });
+  });
 
-  return enhancedScores
+  return enhancedScores;
 }
 
 /**
- * Get wallet-based event recommendations
- *
- * Main entry point for Web3-enhanced recommendations via Reown/WalletConnect
+ * Main Web3 recommendation entry point
  */
 export async function getWeb3Recommendations(
   address: Address,
@@ -258,37 +188,30 @@ export async function getWeb3Recommendations(
   userProfile: UserProfile,
   baseRecommendations: Map<string, number>,
   eventContractAddress?: Address
-): Promise<Array<{ eventId: string; score: number; reasons: string[] }>> {
-  // Build Web3 profile
+) {
   const web3Profile = await buildWeb3Profile(
     address,
     publicClient,
     eventContractAddress
-  )
+  );
 
-  // Apply Web3 boosts to base recommendations
   const enhancedScores = applyWeb3Boost(
     allEvents,
     web3Profile,
     baseRecommendations
-  )
+  );
 
-  // Convert to array and sort
-  const recommendations = Array.from(enhancedScores.entries())
+  return Array.from(enhancedScores.entries())
     .map(([eventId, { score, reasons }]) => ({
       eventId,
       score,
       reasons,
     }))
-    .sort((a, b) => b.score - a.score)
-
-  return recommendations
+    .sort((a, b) => b.score - a.score);
 }
 
 /**
- * Check if user can afford an event based on wallet balance
- *
- * Uses Reown to check user's token balances on Base
+ * Check if user can afford an event
  */
 export async function canAffordEvent(
   address: Address,
@@ -296,16 +219,13 @@ export async function canAffordEvent(
   event: EventWithMetadata
 ): Promise<boolean> {
   try {
-    const balance = await publicClient.getBalance({ address })
-    const eventPrice = event.ticketPrice
+    const balance = await publicClient.getBalance({ address });
+    const priceWithGas = (event.ticketPrice * 110n) / 100n;
 
-    // Add 10% buffer for gas fees
-    const priceWithGas = (eventPrice * BigInt(110)) / BigInt(100)
-
-    return balance >= priceWithGas
+    return balance >= priceWithGas;
   } catch (error) {
-    console.error('Error checking affordability:', error)
-    return false
+    console.error("Error checking affordability:", error);
+    return false;
   }
 }
 
@@ -316,10 +236,10 @@ export async function filterAffordableEvents(
   address: Address,
   publicClient: PublicClient,
   events: EventWithMetadata[]
-): Promise<EventWithMetadata[]> {
-  const affordabilityChecks = await Promise.all(
+) {
+  const checks = await Promise.all(
     events.map((event) => canAffordEvent(address, publicClient, event))
-  )
+  );
 
-  return events.filter((_, index) => affordabilityChecks[index])
+  return events.filter((_, i) => checks[i]);
 }
