@@ -15,6 +15,23 @@ export function timestampToDate(timestamp: bigint): Date {
   return new Date(Number(timestamp) * 1000);
 }
 
+export function formatEventDate(timestamp: bigint, language: LanguageCode = 'en'): string {
+  const date = timestampToDate(timestamp);
+  try {
+    return new Intl.DateTimeFormat(language, {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(date);
+  } catch {
+    return format(date, "EEE, MMM dd, yyyy, HH:mm");
+  }
+}
+
 /**
  * Generate ICS file content for calendar export
  * Compatible with Google Calendar, Apple Calendar, Outlook
