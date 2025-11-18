@@ -12,6 +12,8 @@
   "dependencies": {
     "@reown/appkit": "^1.8.13",
     "@reown/appkit-adapter-wagmi": "^1.8.13",
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.81.1",
     "@tanstack/react-query": "^5.0.0",
     "@types/react-big-calendar": "^1.16.3",
     "clsx": "^2.1.1",
