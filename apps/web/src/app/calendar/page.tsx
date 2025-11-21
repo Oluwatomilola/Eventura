@@ -30,67 +30,19 @@ const EventCalendar = dynamic(
 // Import contract ABI (will need to be added)
 // TODO: Update with actual deployed contract address on Base L2
 const EVENT_FACTORY_ADDRESS = process.env.NEXT_PUBLIC_EVENT_FACTORY_ADDRESS || '0x0000000000000000000000000000000000000000'
+import { CalendarPageContent } from '@/components/pages/CalendarPageContent'
+import { SeoJsonLd } from '@/components/SeoJsonLd'
+import { breadcrumbListJsonLd, createPageMetadata } from '@/lib/seo'
+import { siteConfig } from '@/config/site'
+
+export const metadata = createPageMetadata({
+  title: 'Event Calendar | Eventura',
+  description: 'View on-chain events from Base L2, manage NFT tickets, and export to your calendar.',
+  path: '/calendar',
+  keywords: ['event calendar', 'Base events', 'NFT calendar', 'blockchain events'],
+})
 
 export default function CalendarPage() {
-  const { address, isConnected } = useAccount()
-  const publicClient = usePublicClient()
-  const [events, setEvents] = useState<EventWithMetadata[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [language] = useState(detectUserLanguage())
-
-  // Fetch events from Base L2 blockchain via REOWN connection
-  useEffect(() => {
-    async function fetchEvents() {
-      if (!isConnected || !publicClient) {
-        setLoading(false)
-        return
-      }
-
-      try {
-        setLoading(true)
-        setError(null)
-
-        // TODO: Replace with actual contract ABI
-        // For now, using mock data structure
-        // In production, this would use:
-        // const contract = getContract({
-        //   address: EVENT_FACTORY_ADDRESS,
-        //   abi: EventFactoryABI,
-        //   client: publicClient,
-        // })
-        // const eventCount = await contract.read.eventCount()
-        // Loop through events and fetch metadata from IPFS
-
-        // Mock implementation - replace with actual blockchain read
-        const mockEvents: EventWithMetadata[] = []
-
-        // Example of how to fetch from contract:
-        // for (let i = 0; i < eventCount; i++) {
-        //   const event = await contract.read.getEvent([i])
-        //   const metadata = await fetchEventMetadata(event.metadataURI)
-        //   mockEvents.push({ ...event, metadata })
-        // }
-
-        const sortedEvents = sortEventsByDate(mockEvents)
-        setEvents(sortedEvents)
-      } catch (err) {
-        console.error('Error fetching events:', err)
-        setError('Failed to load events from blockchain')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchEvents()
-  }, [isConnected, publicClient, address])
-
-  // Handle event click
-  const handleEventClick = (event: EventWithMetadata) => {
-    console.log('Event clicked:', event)
-    // Future: Navigate to event detail page or open modal
-  }
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       {/* Background Effects */}
@@ -283,5 +235,14 @@ export default function CalendarPage() {
         </motion.div>
       </div>
     </div>
+    <>
+      <SeoJsonLd
+        data={breadcrumbListJsonLd([
+          { name: 'Home', item: siteConfig.url },
+          { name: 'Calendar', item: `${siteConfig.url}/calendar` },
+        ])}
+      />
+      <CalendarPageContent />
+    </>
   )
 }

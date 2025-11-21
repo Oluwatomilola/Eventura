@@ -1,92 +1,79 @@
 'use client'
 
-import { ConnectButton } from '@/components/ConnectButton'
-import { RecommendedEvents } from '@/components/RecommendedEvents'
-import { EventCardSkeleton } from '@/components/skeletons/EventCardSkeleton'
-import { EmptyState } from '@/components/empty/EmptyState'
-import { CalendarIllustration } from '@/components/illustrations'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Calendar, Shield, Zap, Users, ArrowRight, Sparkles } from 'lucide-react'
 import { useAccount } from 'wagmi'
-import { useOnchainEvents } from '@/hooks/useOnchainEvents'
+import { ConnectButton } from '@/components/ConnectButton'
+import { RecommendedEvents } from '@/components/RecommendedEvents'
+import { sampleEvents } from '@/data/sampleEvents'
 
 const features = [
   {
     icon: Shield,
     title: 'Secure & Transparent',
-    description: 'Blockchain-powered ticketing ensures authenticity and prevents fraud'
+    description: 'Blockchain-powered ticketing ensures authenticity and prevents fraud',
   },
   {
     icon: Zap,
     title: 'Instant Transfers',
-    description: 'Buy, sell, and transfer tickets instantly on the Base network'
+    description: 'Buy, sell, and transfer tickets instantly on the Base network',
   },
   {
     icon: Users,
     title: 'Community Driven',
-    description: 'Connect with event communities and discover new experiences'
+    description: 'Connect with event communities and discover new experiences',
   },
   {
     icon: Calendar,
     title: 'Easy Management',
-    description: 'Manage all your event tickets in one secure digital wallet'
-  }
+    description: 'Manage all your event tickets in one secure digital wallet',
+  },
 ]
 
-export default function Home() {
+export function HomePageContent() {
   const { isConnected } = useAccount()
-  const { events, loading } = useOnchainEvents()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
         <div className="absolute top-40 left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000" />
       </div>
 
-      {/* Header */}
       <header className="relative z-10 px-6 py-6">
-        <nav className="max-w-7xl mx-auto flex items-center justify-between">
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-2"
-          >
-            <a href="/" className="flex items-center gap-2">
+        <nav className="max-w-7xl mx-auto flex items-center justify-between" aria-label="Primary">
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2" aria-label="Eventura home">
               <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
                 <Sparkles className="w-5 h-5 text-white" />
               </div>
               <span className="text-2xl font-bold text-white">Eventura</span>
-            </a>
+            </Link>
           </motion.div>
 
           <div className="hidden md:flex items-center gap-6">
-            <a href="/" className="text-white hover:text-blue-400 transition-colors">
+            <Link href="/" className="text-white hover:text-blue-400 transition-colors">
               Home
-            </a>
-            <a href="/calendar" className="text-white hover:text-blue-400 transition-colors">
+            </Link>
+            <Link href="/calendar" className="text-white hover:text-blue-400 transition-colors">
               Calendar
-            </a>
-            <a href="#" className="text-white hover:text-blue-400 transition-colors">
+            </Link>
+            <Link href="/events" className="text-white hover:text-blue-400 transition-colors">
               Browse Events
-            </a>
-            <a href="#" className="text-white hover:text-blue-400 transition-colors">
-              Create Event
-            </a>
+            </Link>
+            <Link href="/recommendations-demo" className="text-white hover:text-blue-400 transition-colors">
+              Recommendations
+            </Link>
           </div>
 
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-          >
+          <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
             <ConnectButton />
           </motion.div>
         </nav>
       </header>
 
-      {/* Hero Section */}
       <section className="relative z-10 px-6 py-20">
         <div className="max-w-7xl mx-auto text-center">
           <motion.h1
@@ -95,20 +82,15 @@ export default function Home() {
             transition={{ delay: 0.2 }}
             className="text-6xl md:text-8xl font-bold text-white mb-6 leading-tight"
           >
-            The Future of
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              {' '}Event Ticketing
-            </span>
+            Connect with attendees before you arrive
           </motion.h1>
-
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
             className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed"
           >
-            Experience seamless, secure, and transparent event ticketing powered by Base blockchain.
-            No more fraud, no more fake tickets, just pure event magic.
+            Experience seamless, secure, and transparent event ticketing powered by Base blockchain. Buy NFT tickets, create personas, and start networking ahead of the gate.
           </motion.p>
 
           {!isConnected && (
@@ -119,16 +101,18 @@ export default function Home() {
               className="flex flex-col sm:flex-row gap-4 justify-center items-center"
             >
               <ConnectButton />
-              <button className="flex items-center gap-2 px-6 py-3 text-white border border-white/30 rounded-xl hover:bg-white/10 transition-colors">
-                Learn More
+              <Link
+                href="/events"
+                className="flex items-center gap-2 px-6 py-3 text-white border border-white/30 rounded-xl hover:bg-white/10 transition-colors"
+              >
+                Browse Events
                 <ArrowRight className="w-4 h-4" />
-              </button>
+              </Link>
             </motion.div>
           )}
         </div>
       </section>
 
-      {/* Features Grid - Animated */}
       <motion.section
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
@@ -157,74 +141,31 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* Recommended Events Section (on-chain) */}
-      <section className="relative z-10 px-6 py-12">
-        <div className="max-w-7xl mx-auto">
-          {loading ? (
-            <>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 bg-white/10 rounded animate-pulse" />
-                <div className="h-8 w-64 bg-white/10 rounded animate-pulse" />
-              </div>
-              <div className="h-6 w-96 bg-white/5 rounded animate-pulse mb-8" />
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <EventCardSkeleton count={6} />
-              </div>
-            </>
-          ) : events.length > 0 ? (
-            <RecommendedEvents
-              allEvents={events}
-              limit={6}
-            />
-          ) : (
-            <EmptyState
-              illustration={<CalendarIllustration />}
-              heading="No Events Found"
-              message="There are no events available on the blockchain yet. Be the first to create an event!"
-              ctaText="Create Event"
-              ctaLink="#"
-              size="lg"
-            />
-          )}
-        </div>
-      </section>
+      <RecommendedEvents allEvents={sampleEvents} className="relative z-10" limit={6} />
 
-      {/* How It Works Section */}
       <section className="relative z-10 px-6 py-20">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-white">How It Works</h2>
           <div className="grid md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">1</div>
-              <h3 className="text-lg font-semibold mb-2 text-white">Connect Wallet</h3>
-              <p className="text-gray-300">Connect your Web3 wallet to get started</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">2</div>
-              <h3 className="text-lg font-semibold mb-2 text-white">Browse Events</h3>
-              <p className="text-gray-300">Discover amazing events in your area</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">3</div>
-              <h3 className="text-lg font-semibold mb-2 text-white">Purchase Tickets</h3>
-              <p className="text-gray-300">Buy tickets as NFTs on Base blockchain</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">4</div>
-              <h3 className="text-lg font-semibold mb-2 text-white">Attend Event</h3>
-              <p className="text-gray-300">Present your NFT ticket at the venue</p>
-            </div>
+            {['Connect Wallet', 'Browse Events', 'Purchase Tickets', 'Attend Event'].map((step, index) => (
+              <div key={step} className="text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                  {index + 1}
+                </div>
+                <h3 className="text-lg font-semibold mb-2 text-white">{step}</h3>
+                <p className="text-gray-300">
+                  {index === 0 && 'Connect your Web3 wallet to get started'}
+                  {index === 1 && 'Discover amazing events in your area'}
+                  {index === 2 && 'Buy verified NFT tickets on Base'}
+                  {index === 3 && 'Skip the line with on-chain credentials'}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Stats Section - Merged */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.4 }}
-        className="relative z-10 px-6 py-20"
-      >
+      <motion.section initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.4 }} className="relative z-10 px-6 py-20">
         <div className="max-w-7xl mx-auto">
           <div className="bg-white/5 backdrop-blur-md rounded-3xl p-12 border border-white/10">
             <div className="grid md:grid-cols-3 gap-8 text-center">
@@ -245,7 +186,6 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* CTA Section */}
       <section className="relative z-10 px-6 py-20">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">Ready to Get Started?</h2>
@@ -254,7 +194,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="relative z-10 px-6 py-12 border-t border-white/10">
         <div className="max-w-7xl mx-auto">
           <div className="grid md:grid-cols-4 gap-8 mb-8">
@@ -270,40 +209,70 @@ export default function Home() {
             <div>
               <h4 className="font-semibold mb-4 text-white">Platform</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="/calendar" className="hover:text-white transition-colors">Calendar</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Browse Events</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Create Event</a></li>
+                <li>
+                  <Link href="/calendar" className="hover:text-white transition-colors">
+                    Calendar
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/events" className="hover:text-white transition-colors">
+                    Browse Events
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/recommendations-demo" className="hover:text-white transition-colors">
+                    Recommendation Demo
+                  </Link>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4 text-white">Resources</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+                <li>
+                  <Link href="/performance" className="hover:text-white transition-colors">
+                    Performance Dashboard
+                  </Link>
+                </li>
+                <li>
+                  <a href="https://github.com/EventuraHQ" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+                    GitHub
+                  </a>
+                </li>
+                <li>
+                  <a href="https://discord.gg/eventura" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+                    Discord
+                  </a>
+                </li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold mb-4 text-white">Community</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Twitter</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Discord</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">GitHub</a></li>
+                <li>
+                  <a href="https://twitter.com/eventura_app" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+                    Twitter
+                  </a>
+                </li>
+                <li>
+                  <a href="https://www.linkedin.com/company/eventura" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+                    LinkedIn
+                  </a>
+                </li>
+                <li>
+                  <a href="https://discord.gg/eventura" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">
+                    Discord
+                  </a>
+                </li>
               </ul>
             </div>
           </div>
           <div className="border-t border-white/10 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 Eventura. Built on Base with ❤️</p>
+            <p>&copy; {new Date().getFullYear()} Eventura. Built on Base with ❤️</p>
           </div>
         </div>
       </footer>
     </div>
-      <RecommendedEvents
-        allEvents={events}
-        className="relative z-10"
-        limit={6}
-      />
-      <HomePageContent />
-    </>
   )
 }
+
