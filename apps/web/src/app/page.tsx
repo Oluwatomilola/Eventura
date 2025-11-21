@@ -2,6 +2,9 @@
 
 import { ConnectButton } from '@/components/ConnectButton'
 import { RecommendedEvents } from '@/components/RecommendedEvents'
+import { EventCardSkeleton } from '@/components/skeletons/EventCardSkeleton'
+import { EmptyState } from '@/components/empty/EmptyState'
+import { CalendarIllustration } from '@/components/illustrations'
 import { motion } from 'framer-motion'
 import { Calendar, Shield, Zap, Users, ArrowRight, Sparkles } from 'lucide-react'
 import { useAccount } from 'wagmi'
@@ -155,6 +158,146 @@ export default function Home() {
       </motion.section>
 
       {/* Recommended Events Section (on-chain) */}
+      <section className="relative z-10 px-6 py-12">
+        <div className="max-w-7xl mx-auto">
+          {loading ? (
+            <>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-8 h-8 bg-white/10 rounded animate-pulse" />
+                <div className="h-8 w-64 bg-white/10 rounded animate-pulse" />
+              </div>
+              <div className="h-6 w-96 bg-white/5 rounded animate-pulse mb-8" />
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <EventCardSkeleton count={6} />
+              </div>
+            </>
+          ) : events.length > 0 ? (
+            <RecommendedEvents
+              allEvents={events}
+              limit={6}
+            />
+          ) : (
+            <EmptyState
+              illustration={<CalendarIllustration />}
+              heading="No Events Found"
+              message="There are no events available on the blockchain yet. Be the first to create an event!"
+              ctaText="Create Event"
+              ctaLink="#"
+              size="lg"
+            />
+          )}
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="relative z-10 px-6 py-20">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-white">How It Works</h2>
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">1</div>
+              <h3 className="text-lg font-semibold mb-2 text-white">Connect Wallet</h3>
+              <p className="text-gray-300">Connect your Web3 wallet to get started</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">2</div>
+              <h3 className="text-lg font-semibold mb-2 text-white">Browse Events</h3>
+              <p className="text-gray-300">Discover amazing events in your area</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">3</div>
+              <h3 className="text-lg font-semibold mb-2 text-white">Purchase Tickets</h3>
+              <p className="text-gray-300">Buy tickets as NFTs on Base blockchain</p>
+            </div>
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">4</div>
+              <h3 className="text-lg font-semibold mb-2 text-white">Attend Event</h3>
+              <p className="text-gray-300">Present your NFT ticket at the venue</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section - Merged */}
+      <motion.section
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.4 }}
+        className="relative z-10 px-6 py-20"
+      >
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-white/5 backdrop-blur-md rounded-3xl p-12 border border-white/10">
+            <div className="grid md:grid-cols-3 gap-8 text-center">
+              <div>
+                <div className="text-5xl md:text-6xl font-bold text-white mb-2">10K+</div>
+                <div className="text-xl text-gray-300">Events Created</div>
+              </div>
+              <div>
+                <div className="text-5xl md:text-6xl font-bold text-white mb-2">50K+</div>
+                <div className="text-xl text-gray-300">Tickets Sold</div>
+              </div>
+              <div>
+                <div className="text-5xl md:text-6xl font-bold text-white mb-2">99.9%</div>
+                <div className="text-xl text-gray-300">Fraud Prevention</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* CTA Section */}
+      <section className="relative z-10 px-6 py-20">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">Ready to Get Started?</h2>
+          <p className="text-xl mb-8 text-gray-300">Join thousands of users experiencing the future of event ticketing.</p>
+          <ConnectButton />
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="relative z-10 px-6 py-12 border-t border-white/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white">Eventura</h3>
+              </div>
+              <p className="text-gray-400">Decentralized ticketing on Base blockchain</p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4 text-white">Platform</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="/calendar" className="hover:text-white transition-colors">Calendar</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Browse Events</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Create Event</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4 text-white">Resources</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4 text-white">Community</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li><a href="#" className="hover:text-white transition-colors">Twitter</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Discord</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">GitHub</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-white/10 pt-8 text-center text-gray-400">
+            <p>&copy; 2025 Eventura. Built on Base with ❤️</p>
+          </div>
+        </div>
+      </footer>
+    </div>
       <RecommendedEvents
         allEvents={events}
         className="relative z-10"

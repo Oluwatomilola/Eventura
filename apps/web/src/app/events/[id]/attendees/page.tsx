@@ -19,6 +19,9 @@ import {
 import Link from 'next/link'
 import { AttendeeCard } from '@/components/AttendeeCard'
 import { SuggestedConnections } from '@/components/SuggestedConnections'
+import { AttendeeCardSkeleton } from '@/components/skeletons/AttendeeCardSkeleton'
+import { EmptyState } from '@/components/empty/EmptyState'
+import { UsersIllustration, SearchIllustration, FilterIllustration } from '@/components/illustrations'
 
 interface Attendee {
   id: string
@@ -420,67 +423,30 @@ export default function AttendeesPage() {
         {/* Loading Skeleton */}
         {loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-white/5 border border-white/10 rounded-xl p-6 animate-pulse"
-              >
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-16 h-16 bg-white/10 rounded-full" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-6 bg-white/10 rounded w-3/4" />
-                    <div className="h-4 bg-white/10 rounded w-1/2" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="h-4 bg-white/10 rounded" />
-                  <div className="h-4 bg-white/10 rounded w-5/6" />
-                </div>
-              </div>
-            ))}
+            <AttendeeCardSkeleton count={6} />
           </div>
         )}
 
         {/* Empty State - No attendees */}
         {!loading && attendees.length === 0 && !activeFiltersCount && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-12 text-center"
-          >
-            <Users className="w-16 h-16 text-white/40 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-2">No Attendees Yet</h2>
-            <p className="text-white/70 mb-6">
-              Be the first to create your persona and connect with others!
-            </p>
-            <Link
-              href={`/events/${eventId}/create-persona`}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all"
-            >
-              Create Your Persona
-            </Link>
-          </motion.div>
+          <EmptyState
+            illustration={<UsersIllustration />}
+            heading="No Attendees Yet"
+            message="Be the first to create your persona and connect with others!"
+            ctaText="Create Your Persona"
+            ctaLink={`/events/${eventId}/create-persona`}
+          />
         )}
 
         {/* Empty State - No results after filtering */}
         {!loading && attendees.length === 0 && activeFiltersCount > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-12 text-center"
-          >
-            <AlertCircle className="w-16 h-16 text-white/40 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-white mb-2">No Results Found</h2>
-            <p className="text-white/70 mb-6">
-              No attendees match your current filters. Try adjusting your search.
-            </p>
-            <button
-              onClick={handleClearFilters}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-all"
-            >
-              Clear Filters
-            </button>
-          </motion.div>
+          <EmptyState
+            illustration={<FilterIllustration />}
+            heading="No Results Found"
+            message="No attendees match your current filters. Try adjusting your search criteria."
+            ctaText="Clear Filters"
+            onCtaClick={handleClearFilters}
+          />
         )}
 
         {/* Attendees Grid */}
