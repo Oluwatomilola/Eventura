@@ -2,33 +2,30 @@
 
 import { ConnectButton } from '@/components/ConnectButton'
 import { RecommendedEvents } from '@/components/RecommendedEvents'
-import { EventCardSkeleton } from '@/components/skeletons/EventCardSkeleton'
-import { EmptyState } from '@/components/empty/EmptyState'
-import { CalendarIllustration } from '@/components/illustrations'
 import { motion } from 'framer-motion'
-import { Calendar, Shield, Zap, Users, ArrowRight, Sparkles } from 'lucide-react'
+import { Calendar, Shield, Zap, Users, ArrowRight, Sparkles, Settings } from 'lucide-react'
 import { useAccount } from 'wagmi'
 import { useOnchainEvents } from '@/hooks/useOnchainEvents'
 
 const features = [
   {
     icon: Shield,
-    title: 'Secure & Transparent',
+    title: 'SECURE & TRANSPARENT',
     description: 'Blockchain-powered ticketing ensures authenticity and prevents fraud'
   },
   {
     icon: Zap,
-    title: 'Instant Transfers',
+    title: 'INSTANT TRANSFERS',
     description: 'Buy, sell, and transfer tickets instantly on the Base network'
   },
   {
     icon: Users,
-    title: 'Community Driven',
+    title: 'COMMUNITY DRIVEN',
     description: 'Connect with event communities and discover new experiences'
   },
   {
     icon: Calendar,
-    title: 'Easy Management',
+    title: 'EASY MANAGEMENT',
     description: 'Manage all your event tickets in one secure digital wallet'
   }
 ]
@@ -38,42 +35,49 @@ export default function Home() {
   const { events, loading } = useOnchainEvents()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob" />
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000" />
-        <div className="absolute top-40 left-40 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000" />
-      </div>
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 selection:bg-cyan-500/30">
+      {/* Grid Background Pattern */}
+      <div className="fixed inset-0 z-0 opacity-10 pointer-events-none" 
+           style={{ 
+             backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px)', 
+             backgroundSize: '40px 40px' 
+           }} 
+      />
 
       {/* Header */}
-      <header className="relative z-10 px-6 py-6">
-        <nav className="max-w-7xl mx-auto flex items-center justify-between">
+      <header className="relative z-10 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-sm">
+        <nav className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center gap-2"
           >
-            <a href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-white" />
+            <a href="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 bg-zinc-900 border border-zinc-700 flex items-center justify-center group-hover:border-cyan-500 transition-colors">
+                <Sparkles className="w-5 h-5 text-cyan-400" />
               </div>
-              <span className="text-2xl font-bold text-white">Eventura</span>
+              <span className="text-2xl font-bold tracking-tight text-white group-hover:text-cyan-400 transition-colors">EVENTURA</span>
             </a>
           </motion.div>
 
-          <div className="hidden md:flex items-center gap-6">
-            <a href="/" className="text-white hover:text-blue-400 transition-colors">
-              Home
+          <div className="hidden md:flex items-center gap-8 text-sm font-medium tracking-wide">
+            <a href="/" className="text-cyan-400 hover:text-cyan-300 transition-colors">
+              HOME
             </a>
-            <a href="/calendar" className="text-white hover:text-blue-400 transition-colors">
-              Calendar
+            <a href="/calendar" className="text-zinc-400 hover:text-white transition-colors">
+              CALENDAR
             </a>
-            <a href="#" className="text-white hover:text-blue-400 transition-colors">
-              Browse Events
+            <a href="/dashboard" className="text-zinc-400 hover:text-white transition-colors">
+              DASHBOARD
             </a>
-            <a href="#" className="text-white hover:text-blue-400 transition-colors">
-              Create Event
+            <a href="#" className="text-zinc-400 hover:text-white transition-colors">
+              BROWSE
+            </a>
+            <a href="#" className="text-zinc-400 hover:text-white transition-colors">
+              CREATE
+            </a>
+            <a href="/settings" className="text-zinc-400 hover:text-white transition-colors" title="Settings">
+              <Settings className="w-5 h-5" />
             </a>
           </div>
 
@@ -87,223 +91,195 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative z-10 px-6 py-20">
-        <div className="max-w-7xl mx-auto text-center">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="text-6xl md:text-8xl font-bold text-white mb-6 leading-tight"
-          >
-            The Future of
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              {' '}Event Ticketing
-            </span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed"
-          >
-            Experience seamless, secure, and transparent event ticketing powered by Base blockchain.
-            No more fraud, no more fake tickets, just pure event magic.
-          </motion.p>
-
-          {!isConnected && (
+      <section className="relative z-10 px-6 py-32 border-b border-zinc-800/50">
+        <div className="max-w-7xl mx-auto">
+          <div className="max-w-4xl">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center items-center"
+              transition={{ delay: 0.2 }}
+              className="mb-6 inline-block px-3 py-1 border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 text-xs font-mono tracking-wider"
             >
-              <ConnectButton />
-              <button className="flex items-center gap-2 px-6 py-3 text-white border border-white/30 rounded-xl hover:bg-white/10 transition-colors">
-                Learn More
-                <ArrowRight className="w-4 h-4" />
-              </button>
+              SYSTEM: ONLINE // BASE NETWORK
             </motion.div>
-          )}
+            
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-6xl md:text-8xl font-bold text-white mb-8 leading-none tracking-tight"
+            >
+              THE FUTURE OF
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-600">
+                EVENT TICKETING
+              </span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+              className="text-xl text-zinc-400 mb-12 max-w-2xl leading-relaxed border-l-2 border-zinc-800 pl-6"
+            >
+              Seamless, secure, and transparent event ticketing on the blockchain.
+              Fraud eliminated. Authenticity guaranteed.
+            </motion.p>
+
+            {!isConnected && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="flex flex-col sm:flex-row gap-4 items-start"
+              >
+                <ConnectButton />
+                <button className="h-[50px] flex items-center gap-2 px-8 bg-transparent border border-zinc-700 text-white hover:bg-zinc-900 hover:border-white transition-all font-medium">
+                  LEARN MORE
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </motion.div>
+            )}
+          </div>
         </div>
       </section>
 
-      {/* Features Grid - Animated */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.8 }}
-        className="relative z-10 px-6 py-20"
-      >
+      {/* Features Grid */}
+      <section className="relative z-10 px-6 py-32 border-b border-zinc-800/50 bg-zinc-950">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-white">Why Choose Eventura?</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="flex items-center justify-between mb-16">
+            <h2 className="text-3xl font-bold text-white tracking-tight">SYSTEM FEATURES</h2>
+            <div className="h-px flex-1 bg-zinc-800 ml-8"></div>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
               <motion.div
                 key={feature.title}
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1 + index * 0.1 }}
-                className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-colors"
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="group p-8 bg-zinc-900/50 border border-zinc-800 hover:border-cyan-500/50 hover:bg-zinc-900 transition-all duration-300"
               >
-                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 bg-zinc-950 border border-zinc-800 flex items-center justify-center mb-6 group-hover:border-cyan-500/50 transition-colors">
+                  <feature.icon className="w-6 h-6 text-zinc-400 group-hover:text-cyan-400 transition-colors" />
                 </div>
-                <h3 className="text-xl font-semibold text-white mb-2">{feature.title}</h3>
-                <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                <h3 className="text-lg font-bold text-white mb-3 tracking-wide">{feature.title}</h3>
+                <p className="text-zinc-500 text-sm leading-relaxed group-hover:text-zinc-400 transition-colors">
+                  {feature.description}
+                </p>
               </motion.div>
             ))}
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* Recommended Events Section (on-chain) */}
-      <section className="relative z-10 px-6 py-12">
-        <div className="max-w-7xl mx-auto">
-          {loading ? (
-            <>
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 bg-white/10 rounded animate-pulse" />
-                <div className="h-8 w-64 bg-white/10 rounded animate-pulse" />
-              </div>
-              <div className="h-6 w-96 bg-white/5 rounded animate-pulse mb-8" />
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <EventCardSkeleton count={6} />
-              </div>
-            </>
-          ) : events.length > 0 ? (
-            <RecommendedEvents
-              allEvents={events}
-              limit={6}
-            />
-          ) : (
-            <EmptyState
-              illustration={<CalendarIllustration />}
-              heading="No Events Found"
-              message="There are no events available on the blockchain yet. Be the first to create an event!"
-              ctaText="Create Event"
-              ctaLink="#"
-              size="lg"
-            />
-          )}
-        </div>
-      </section>
+      <RecommendedEvents
+        allEvents={events}
+        className="relative z-10 py-32 border-b border-zinc-800/50"
+        limit={6}
+      />
 
       {/* How It Works Section */}
-      <section className="relative z-10 px-6 py-20">
+      <section className="relative z-10 px-6 py-32 border-b border-zinc-800/50 bg-zinc-900/30">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-white">How It Works</h2>
+          <div className="flex items-center justify-between mb-16">
+            <h2 className="text-3xl font-bold text-white tracking-tight">PROTOCOL</h2>
+            <div className="h-px flex-1 bg-zinc-800 ml-8"></div>
+          </div>
+
           <div className="grid md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">1</div>
-              <h3 className="text-lg font-semibold mb-2 text-white">Connect Wallet</h3>
-              <p className="text-gray-300">Connect your Web3 wallet to get started</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">2</div>
-              <h3 className="text-lg font-semibold mb-2 text-white">Browse Events</h3>
-              <p className="text-gray-300">Discover amazing events in your area</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">3</div>
-              <h3 className="text-lg font-semibold mb-2 text-white">Purchase Tickets</h3>
-              <p className="text-gray-300">Buy tickets as NFTs on Base blockchain</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">4</div>
-              <h3 className="text-lg font-semibold mb-2 text-white">Attend Event</h3>
-              <p className="text-gray-300">Present your NFT ticket at the venue</p>
-            </div>
+            {[
+              { step: '01', title: 'CONNECT', desc: 'Link your Web3 wallet' },
+              { step: '02', title: 'BROWSE', desc: 'Find local events' },
+              { step: '03', title: 'ACQUIRE', desc: 'Purchase NFT tickets' },
+              { step: '04', title: 'ATTEND', desc: 'Verify and enter' }
+            ].map((item) => (
+              <div key={item.step} className="relative p-6 border-l border-zinc-800 hover:border-cyan-500 transition-colors duration-300">
+                <span className="text-4xl font-bold text-zinc-800 mb-4 block font-mono">{item.step}</span>
+                <h3 className="text-lg font-bold text-white mb-2 tracking-wider">{item.title}</h3>
+                <p className="text-zinc-500 text-sm">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Stats Section - Merged */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 1.4 }}
-        className="relative z-10 px-6 py-20"
-      >
+      {/* Stats Section */}
+      <section className="relative z-10 px-6 py-32 border-b border-zinc-800/50">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-white/5 backdrop-blur-md rounded-3xl p-12 border border-white/10">
-            <div className="grid md:grid-cols-3 gap-8 text-center">
-              <div>
-                <div className="text-5xl md:text-6xl font-bold text-white mb-2">10K+</div>
-                <div className="text-xl text-gray-300">Events Created</div>
+          <div className="grid md:grid-cols-3 gap-px bg-zinc-800 border border-zinc-800">
+            {[
+              { label: 'EVENTS CREATED', value: '10K+' },
+              { label: 'TICKETS SOLD', value: '50K+' },
+              { label: 'FRAUD PREVENTION', value: '99.9%' }
+            ].map((stat) => (
+              <div key={stat.label} className="bg-zinc-950 p-12 text-center hover:bg-zinc-900/80 transition-colors">
+                <div className="text-5xl md:text-6xl font-bold text-white mb-2 tracking-tighter">{stat.value}</div>
+                <div className="text-sm text-cyan-500 font-mono tracking-widest uppercase">{stat.label}</div>
               </div>
-              <div>
-                <div className="text-5xl md:text-6xl font-bold text-white mb-2">50K+</div>
-                <div className="text-xl text-gray-300">Tickets Sold</div>
-              </div>
-              <div>
-                <div className="text-5xl md:text-6xl font-bold text-white mb-2">99.9%</div>
-                <div className="text-xl text-gray-300">Fraud Prevention</div>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
-      </motion.section>
+      </section>
 
       {/* CTA Section */}
-      <section className="relative z-10 px-6 py-20">
+      <section className="relative z-10 px-6 py-32">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-white">Ready to Get Started?</h2>
-          <p className="text-xl mb-8 text-gray-300">Join thousands of users experiencing the future of event ticketing.</p>
-          <ConnectButton />
+          <h2 className="text-4xl md:text-5xl font-bold mb-8 text-white tracking-tight">INITIATE CONNECTION</h2>
+          <p className="text-xl mb-12 text-zinc-400">Join the network. Experience the future of ticketing.</p>
+          <div className="flex justify-center">
+            <ConnectButton />
+          </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="relative z-10 px-6 py-12 border-t border-white/10">
+      <footer className="relative z-10 px-6 py-12 border-t border-zinc-800 bg-zinc-950">
         <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
+          <div className="grid md:grid-cols-4 gap-12 mb-16">
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-white" />
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-8 h-8 bg-zinc-900 border border-zinc-700 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-cyan-400" />
                 </div>
-                <h3 className="text-xl font-bold text-white">Eventura</h3>
+                <h3 className="text-xl font-bold text-white tracking-tight">EVENTURA</h3>
               </div>
-              <p className="text-gray-400">Decentralized ticketing on Base blockchain</p>
+              <p className="text-zinc-500 text-sm leading-relaxed">
+                Decentralized ticketing protocol on Base.
+                <br />Secure. Transparent. Verified.
+              </p>
             </div>
-            <div>
-              <h4 className="font-semibold mb-4 text-white">Platform</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="/calendar" className="hover:text-white transition-colors">Calendar</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Browse Events</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Create Event</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4 text-white">Resources</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Documentation</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Support</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">FAQ</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4 text-white">Community</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">Twitter</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Discord</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">GitHub</a></li>
-              </ul>
-            </div>
+            
+            {[
+              { title: 'PLATFORM', links: ['Calendar', 'Browse Events', 'Create Event'] },
+              { title: 'RESOURCES', links: ['Documentation', 'Support', 'FAQ'] },
+              { title: 'COMMUNITY', links: ['Twitter', 'Discord', 'GitHub'] }
+            ].map((col) => (
+              <div key={col.title}>
+                <h4 className="font-mono text-sm text-zinc-500 mb-6 tracking-wider">{col.title}</h4>
+                <ul className="space-y-3 text-sm font-medium text-zinc-300">
+                  {col.links.map((link) => (
+                    <li key={link}>
+                      <a href="#" className="hover:text-cyan-400 transition-colors uppercase tracking-wide">{link}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
-          <div className="border-t border-white/10 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 Eventura. Built on Base with ❤️</p>
+          
+          <div className="border-t border-zinc-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-zinc-600 font-mono">
+            <p>&copy; 2025 EVENTURA PROTOCOL. BASE NETWORK.</p>
+            <div className="flex gap-6">
+              <a href="#" className="hover:text-zinc-400">PRIVACY</a>
+              <a href="#" className="hover:text-zinc-400">TERMS</a>
+            </div>
           </div>
         </div>
       </footer>
     </div>
-      <RecommendedEvents
-        allEvents={events}
-        className="relative z-10"
-        limit={6}
-      />
-      <HomePageContent />
-    </>
   )
 }

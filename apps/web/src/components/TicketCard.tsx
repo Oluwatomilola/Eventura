@@ -1,14 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount, useWalletClient, usePublicClient } from 'wagmi'
 import { motion } from 'framer-motion'
-import { Calendar, MapPin, Ticket, Download, Share2, ExternalLink, QrCode, RefreshCw, CheckCircle } from 'lucide-react'
+import { Calendar, MapPin, Ticket, Download, Share2, ExternalLink, QrCode, RefreshCw, CheckCircle, X } from 'lucide-react'
 import Link from 'next/link'
 import QRCodeReact from 'qrcode.react'
 import type { EventWithMetadata, LanguageCode } from '@/types/multilang-event'
 import { getTranslation, detectUserLanguage } from '@/utils/multilang'
 import { formatEventDate } from '@/utils/multilang'
+import { useOnboardingStore } from '@/store/useOnboardingStore'
 
 // TODO: Update with actual deployed contract address on Base L2
 const EVENT_TICKETING_ADDRESS = process.env.NEXT_PUBLIC_EVENT_TICKETING_ADDRESS || '0x0000000000000000000000000000000000000000'
@@ -40,6 +41,7 @@ export function TicketCard({
   const { address, isConnected } = useAccount()
   const { data: walletClient } = useWalletClient()
   const publicClient = usePublicClient()
+  const { markMilestone } = useOnboardingStore()
 
   const [showQR, setShowQR] = useState(false)
   const [showTransferModal, setShowTransferModal] = useState(false)
@@ -157,76 +159,82 @@ export function TicketCard({
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative bg-gradient-to-br from-slate-800 to-slate-900 border border-white/20 rounded-lg overflow-hidden shadow-lg"
+        className="relative bg-zinc-950 border border-zinc-800 hover:border-cyan-500/30 overflow-hidden transition-colors group"
       >
         {/* Status Badge */}
         <div className="absolute top-4 right-4 z-10">
           {ticket.used ? (
-            <span className="px-3 py-1 bg-gray-600 text-white text-xs font-bold rounded-full flex items-center gap-1">
+            <span className="px-3 py-1 bg-zinc-800 border border-zinc-600 text-zinc-400 text-xs font-mono uppercase tracking-wider flex items-center gap-1">
               <CheckCircle className="w-3 h-3" />
-              USED
+              CONSUMED
             </span>
           ) : hasEnded ? (
-            <span className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-full">
+            <span className="px-3 py-1 bg-red-900/30 border border-red-500/30 text-red-500 text-xs font-mono uppercase tracking-wider">
               EXPIRED
             </span>
           ) : hasStarted ? (
-            <span className="px-3 py-1 bg-green-600 text-white text-xs font-bold rounded-full animate-pulse">
-              ACTIVE
+            <span className="px-3 py-1 bg-green-900/30 border border-green-500/30 text-green-500 text-xs font-mono uppercase tracking-wider animate-pulse">
+              ACTIVE_EVENT
             </span>
           ) : (
-            <span className="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full">
-              VALID
+            <span className="px-3 py-1 bg-cyan-900/30 border border-cyan-500/30 text-cyan-400 text-xs font-mono uppercase tracking-wider">
+              VALID_ASSET
             </span>
           )}
         </div>
 
         {/* Event Image Header */}
         {ticket.event.metadata.media?.coverImage && (
-          <div className="relative h-32 overflow-hidden">
+          <div className="relative h-32 overflow-hidden border-b border-zinc-800">
             <img
               src={ticket.event.metadata.media.coverImage.replace('ipfs://', 'https://ipfs.io/ipfs/')}
               alt={translation.name}
-              className="w-full h-full object-cover opacity-40"
+              className="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-opacity grayscale group-hover:grayscale-0"
             />
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-900" />
+            <div className="absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.5)_50%)] bg-[length:100%_4px] pointer-events-none opacity-40" />
           </div>
         )}
 
         {/* Ticket Content */}
         <div className="p-6">
           {/* Ticket ID */}
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between mb-4 pb-4 border-b border-zinc-800">
             <div className="flex items-center gap-2">
-              <Ticket className="w-5 h-5 text-blue-400" />
-              <span className="text-sm text-gray-400">Ticket ID</span>
+              <Ticket className="w-4 h-4 text-cyan-500" />
+              <span className="text-xs text-zinc-500 font-mono uppercase tracking-wider">Asset_ID</span>
             </div>
-            <span className="text-lg font-mono font-bold text-white">#{ticket.ticketId.toString()}</span>
+            <span className="text-sm font-mono font-bold text-white">#{ticket.ticketId.toString()}</span>
           </div>
 
           {/* Event Details */}
-          <div className="mb-4">
-            <h3 className="text-xl font-bold text-white mb-2">{translation.name}</h3>
+          <div className="mb-6">
+            <h3 className="text-lg font-bold text-white mb-3 tracking-tight">{translation.name}</h3>
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <Calendar className="w-4 h-4 text-purple-400" />
+              <div className="flex items-center gap-2 text-xs text-zinc-400 font-mono">
+                <Calendar className="w-3 h-3 text-cyan-600" />
                 <span>{formatEventDate(ticket.event.startTime, language)}</span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-gray-300">
-                <MapPin className="w-4 h-4 text-green-400" />
+              <div className="flex items-center gap-2 text-xs text-zinc-400 font-mono">
+                <MapPin className="w-3 h-3 text-cyan-600" />
                 <span>{translation.location}</span>
               </div>
             </div>
           </div>
 
           {/* NFT Info */}
-          <div className="mb-4 p-3 bg-white/5 rounded-lg border border-white/10">
-            <p className="text-xs text-gray-400 mb-1">NFT Contract</p>
-            <p className="text-xs font-mono text-white break-all">{EVENT_TICKETING_ADDRESS}</p>
-            <p className="text-xs text-gray-400 mt-2 mb-1">Owner</p>
-            <p className="text-xs font-mono text-white break-all">{ticket.owner}</p>
-            <p className="text-xs text-gray-400 mt-2 mb-1">Network</p>
-            <p className="text-xs text-white">Base L2</p>
+          <div className="mb-6 p-3 bg-zinc-900/50 border border-zinc-800 font-mono text-[10px]">
+            <div className="flex justify-between mb-1">
+              <span className="text-zinc-600 uppercase">Contract</span>
+              <span className="text-zinc-400">{EVENT_TICKETING_ADDRESS.slice(0, 12)}...</span>
+            </div>
+            <div className="flex justify-between mb-1">
+              <span className="text-zinc-600 uppercase">Owner</span>
+              <span className="text-zinc-400">{ticket.owner.slice(0, 12)}...</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-600 uppercase">Network</span>
+              <span className="text-cyan-500">BASE L2</span>
+            </div>
           </div>
 
           {/* QR Code Section */}
@@ -235,24 +243,24 @@ export function TicketCard({
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
-              className="mb-4 p-4 bg-white rounded-lg flex flex-col items-center"
+              className="mb-4 p-4 bg-white rounded-none border-2 border-white flex flex-col items-center"
             >
               <QRCodeReact
                 id={`qr-${ticket.ticketId}`}
                 value={qrData}
                 size={200}
                 level="H"
-                includeMargin
+                includeMargin={false}
               />
-              <p className="text-xs text-gray-600 mt-2 text-center">
-                Scan this QR code at the event entrance
+              <p className="text-[10px] font-mono text-black mt-2 text-center uppercase tracking-widest">
+                Scan for Entry Verification
               </p>
               <button
                 onClick={handleDownloadQR}
-                className="mt-3 flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded transition-colors"
+                className="mt-3 flex items-center gap-2 px-4 py-2 bg-black text-white text-xs font-mono uppercase hover:bg-zinc-800 transition-colors w-full justify-center"
               >
-                <Download className="w-4 h-4" />
-                Download QR Code
+                <Download className="w-3 h-3" />
+                Save_IMG
               </button>
             </motion.div>
           )}
@@ -261,63 +269,62 @@ export function TicketCard({
           <div className="grid grid-cols-2 gap-3">
             <button
               onClick={() => setShowQR(!showQR)}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold font-mono uppercase tracking-wider border border-zinc-700 hover:border-zinc-500 transition-all"
             >
-              <QrCode className="w-4 h-4" />
-              {showQR ? 'Hide' : 'Show'} QR
+              <QrCode className="w-3 h-3" />
+              {showQR ? 'Hide' : 'Show'}_QR
             </button>
 
             <Link
               href={`/events/${ticket.eventId}`}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold font-mono uppercase tracking-wider border border-zinc-700 hover:border-zinc-500 transition-all"
             >
-              <ExternalLink className="w-4 h-4" />
-              Event
+              <ExternalLink className="w-3 h-3" />
+              Event_Data
             </Link>
 
             <button
               onClick={() => setShowTransferModal(true)}
               disabled={ticket.used || hasStarted || processing}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed text-cyan-400 text-xs font-bold font-mono uppercase tracking-wider border border-cyan-900 hover:border-cyan-500 transition-all"
             >
-              <Share2 className="w-4 h-4" />
+              <Share2 className="w-3 h-3" />
               Transfer
             </button>
 
             <button
               onClick={handleRefund}
               disabled={!canRefund || processing}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed text-red-500 text-xs font-bold font-mono uppercase tracking-wider border border-red-900 hover:border-red-500 transition-all"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-3 h-3" />
               Refund
             </button>
-          </div>
-
-          {/* Purchase Info */}
-          <div className="mt-4 pt-4 border-t border-white/10 text-xs text-gray-400">
-            <p>Purchased: {new Date(Number(ticket.purchaseTime) * 1000).toLocaleDateString()}</p>
-            <p>Price: {(Number(ticket.event.ticketPrice) / 1e18).toFixed(4)} ETH</p>
           </div>
         </div>
       </motion.div>
 
       {/* Transfer Modal */}
       {showTransferModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-slate-800 rounded-lg max-w-md w-full p-6 border border-white/20"
+            className="bg-zinc-950 rounded-none max-w-md w-full p-6 border border-cyan-500/30 shadow-[0_0_50px_-10px_rgba(6,182,212,0.2)]"
           >
-            <h3 className="text-2xl font-bold text-white mb-4">Transfer Ticket</h3>
+            <div className="flex justify-between items-start mb-6 border-b border-zinc-800 pb-4">
+              <h3 className="text-xl font-bold text-white font-mono uppercase tracking-wide">Transfer Asset</h3>
+              <button onClick={() => setShowTransferModal(false)} className="text-zinc-500 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-            <p className="text-sm text-gray-300 mb-6">
-              Transfer this ticket NFT to another wallet address. The recipient will become the new owner.
+            <p className="text-xs text-zinc-400 mb-6 font-mono leading-relaxed">
+              WARNING: Transferring this NFT is irreversible. Ensure the recipient address supports Base L2 assets.
             </p>
 
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-xs font-mono text-cyan-500 mb-2 uppercase tracking-widest">
                 Recipient Address
               </label>
               <input
@@ -325,13 +332,13 @@ export function TicketCard({
                 value={transferAddress}
                 onChange={(e) => setTransferAddress(e.target.value)}
                 placeholder="0x..."
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-3 bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-600 focus:outline-none focus:border-cyan-500 font-mono text-sm"
               />
             </div>
 
             {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded text-red-400 text-sm">
-                {error}
+              <div className="mb-6 p-3 bg-red-900/20 border border-red-500/30 text-red-400 text-xs font-mono">
+                ERROR: {error}
               </div>
             )}
 
@@ -343,23 +350,16 @@ export function TicketCard({
                   setError(null)
                 }}
                 disabled={processing}
-                className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-3 bg-transparent border border-zinc-700 hover:border-zinc-500 text-zinc-400 hover:text-white text-xs font-mono uppercase tracking-wider transition-colors"
               >
-                Cancel
+                Abort
               </button>
               <button
                 onClick={handleTransfer}
                 disabled={processing || !transferAddress}
-                className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-3 bg-cyan-600 hover:bg-cyan-500 disabled:bg-cyan-900/50 text-zinc-950 font-bold font-mono uppercase tracking-wider transition-all disabled:cursor-not-allowed"
               >
-                {processing ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Processing...
-                  </span>
-                ) : (
-                  'Confirm Transfer'
-                )}
+                {processing ? 'EXECUTING...' : 'CONFIRM_TRANSFER'}
               </button>
             </div>
           </motion.div>

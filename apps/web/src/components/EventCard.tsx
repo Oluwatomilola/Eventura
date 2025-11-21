@@ -23,6 +23,8 @@ interface EventCardProps {
   compact?: boolean
 }
 
+import { useOnboardingStore } from '@/store/useOnboardingStore'
+
 export function EventCard({
   event,
   language = detectUserLanguage(),
@@ -32,11 +34,27 @@ export function EventCard({
   const { address, isConnected } = useAccount()
   const { data: walletClient } = useWalletClient()
   const publicClient = usePublicClient()
+  const { markMilestone, markFeatureAsSeen, seenFeatures } = useOnboardingStore()
 
   const [purchasing, setPurchasing] = useState(false)
   const [showPurchaseModal, setShowPurchaseModal] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  
+  // Tooltip state for first time viewing
+  const [showDetailTooltip, setShowDetailTooltip] = useState(false)
+
+  useEffect(() => {
+    if (!seenFeatures['view_event_detail']) {
+      const timer = setTimeout(() => setShowDetailTooltip(true), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [seenFeatures])
+
+  const dismissTooltip = () => {
+    setShowDetailTooltip(false)
+    markFeatureAsSeen('view_event_detail')
+  }
 
   const translation = getTranslation(event.metadata, language)
 
@@ -110,6 +128,9 @@ export function EventCard({
       // Mock success for development
       await new Promise(resolve => setTimeout(resolve, 2000))
       const mockTicketId = BigInt(Math.floor(Math.random() * 1000))
+      
+      // Track milestone
+      markMilestone('first_ticket_purchased')
 
       setShowPurchaseModal(false)
       onPurchaseSuccess?.(mockTicketId)
@@ -250,9 +271,23 @@ export function EventCard({
 
               <Link
                 href={`/events/${event.id}`}
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors"
+                className="relative flex items-center justify-center gap-2 px-6 py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-white text-white font-semibold transition-colors"
               >
-                View Details
+                {showDetailTooltip && (
+                  <div className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 w-64 bg-zinc-950 border border-cyan-500 p-4 shadow-[0_0_20px_rgba(6,182,212,0.3)] z-50 animate-bounce-subtle">
+                    <h4 className="text-cyan-500 font-mono text-xs uppercase tracking-wider mb-2">System Hint</h4>
+                    <p className="text-xs text-zinc-300 mb-3">Inspect event parameters and attendee manifests here.</p>
+                    <button 
+                      onClick={(e) => { e.preventDefault(); dismissTooltip(); }}
+                      className="text-xs font-mono uppercase text-white border-b border-white/50 hover:border-white"
+                    >
+                      Acknowledge
+                    </button>
+                    {/* Triangle pointer */}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-cyan-500" />
+                  </div>
+                )}
+                <span>VIEW_DATA</span>
                 <ExternalLink className="w-4 h-4" />
               </Link>
             </div>
