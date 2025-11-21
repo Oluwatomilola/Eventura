@@ -19,6 +19,9 @@ import {
 import Link from 'next/link'
 import { AttendeeCard } from '@/components/AttendeeCard'
 import { SuggestedConnections } from '@/components/SuggestedConnections'
+import { AttendeeCardSkeleton } from '@/components/skeletons/AttendeeCardSkeleton'
+import { EmptyState } from '@/components/empty/EmptyState'
+import { UsersIllustration, SearchIllustration, FilterIllustration } from '@/components/illustrations'
 
 interface Attendee {
   id: string
@@ -420,24 +423,7 @@ export default function AttendeesPage() {
         {/* Loading Skeleton */}
         {loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div
-                key={i}
-                className="bg-white/5 border border-white/10 rounded-xl p-6 animate-pulse"
-              >
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-16 h-16 bg-white/10 rounded-full" />
-                  <div className="flex-1 space-y-2">
-                    <div className="h-6 bg-white/10 rounded w-3/4" />
-                    <div className="h-4 bg-white/10 rounded w-1/2" />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="h-4 bg-white/10 rounded" />
-                  <div className="h-4 bg-white/10 rounded w-5/6" />
-                </div>
-              </div>
-            ))}
+            <AttendeeCardSkeleton count={6} />
           </div>
         )}
 
