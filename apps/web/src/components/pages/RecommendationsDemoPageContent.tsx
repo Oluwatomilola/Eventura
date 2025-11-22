@@ -12,9 +12,8 @@ import {
   getInteractionStats,
   clearInteractions,
   trackInteraction,
-  type UserInteraction,
 } from '@/lib/userTracking'
-import { buildUserProfile, clearRecommendationCache } from '@/lib/recommendations'
+import { buildUserProfile, clearRecommendationCache, type UserInteraction } from '@/lib/recommendations'
 
 export function RecommendationsDemoPageContent() {
   const { address } = useAccount()
@@ -40,18 +39,18 @@ export function RecommendationsDemoPageContent() {
   }
 
   const handleSimulateInteraction = (type: UserInteraction['type'], eventId?: string) => {
-    const event = eventId ? sampleEvents.find((e) => e.id === eventId) : sampleEvents[Math.floor(Math.random() * sampleEvents.length)]
+    const event = eventId ? sampleEvents.find((e) => String(e.id) === eventId) : sampleEvents[Math.floor(Math.random() * sampleEvents.length)]
 
     if (!event) return
 
     trackInteraction({
       userId: address || 'anonymous',
-      eventId: event.id || '',
+      eventId: String(event.id) || '',
       type,
       metadata: {
-        category: event.metadata?.category,
-        price: event.metadata?.price,
-        location: event.metadata?.location,
+        category: (event.metadata as any)?.category,
+        price: (event.metadata as any)?.price,
+        location: (event.metadata as any)?.location,
       },
     })
 
@@ -175,7 +174,7 @@ export function RecommendationsDemoPageContent() {
                     selectedEvent.id === event.id ? 'bg-blue-500 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'
                   }`}
                 >
-                  {event.metadata?.title}
+                  {(event.metadata as any)?.title}
                 </button>
               ))}
             </div>

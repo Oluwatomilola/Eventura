@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount, useWalletClient, usePublicClient } from 'wagmi'
 import { motion } from 'framer-motion'
 import { Calendar, MapPin, Users, Ticket, ExternalLink, Clock } from 'lucide-react'

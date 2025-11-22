@@ -5,7 +5,7 @@ import { useAccount, useWalletClient, usePublicClient } from 'wagmi'
 import { motion } from 'framer-motion'
 import { Calendar, MapPin, Ticket, Download, Share2, ExternalLink, QrCode, RefreshCw, CheckCircle, X } from 'lucide-react'
 import Link from 'next/link'
-import QRCodeReact from 'qrcode.react'
+import { QRCodeSVG } from 'qrcode.react'
 import type { EventWithMetadata, LanguageCode } from '@/types/multilang-event'
 import { getTranslation, detectUserLanguage } from '@/utils/multilang'
 import { formatEventDate } from '@/utils/multilang'
@@ -245,7 +245,7 @@ export function TicketCard({
               exit={{ opacity: 0, height: 0 }}
               className="mb-4 p-4 bg-white rounded-none border-2 border-white flex flex-col items-center"
             >
-              <QRCodeReact
+              <QRCodeSVG
                 id={`qr-${ticket.ticketId}`}
                 value={qrData}
                 size={200}

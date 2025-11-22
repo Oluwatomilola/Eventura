@@ -135,7 +135,7 @@ export function InvisibleHCaptcha({
   siteKey: string
   onVerify: (token: string) => void
   onError?: (error: string) => void
-  children: React.ReactNode
+  children: React.ReactNode | ((props: { executing: boolean }) => React.ReactNode)
   disabled?: boolean
 }) {
   const [executing, setExecuting] = useState(false)
