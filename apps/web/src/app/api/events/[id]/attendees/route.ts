@@ -116,8 +116,8 @@ export async function GET(
           .single()
       : null
 
-    const requestingInterests = requestingPersona?.data?.interests || []
-    const requestingLookingFor = requestingPersona?.data?.looking_for || []
+    const requestingInterests = (requestingPersona?.data as any)?.interests || []
+    const requestingLookingFor = (requestingPersona?.data as any)?.looking_for || []
 
     // Map personas and calculate shared interests
     const attendees = personas.map((persona: any) => {

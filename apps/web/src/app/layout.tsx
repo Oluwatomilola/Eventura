@@ -3,8 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { AppKitProvider } from '@/components/providers/AppkitProviders'
 import { WebVitals } from './web-vitals'
-import { MainNav } from '@/components/MainNav'
-import { Toaster } from '@/components/ui/toaster'
+import { Onboarding } from '@/components/Onboarding'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -27,13 +26,8 @@ export default function RootLayout({
       <body className={`${inter.className} min-h-screen bg-background`}>
         <WebVitals />
         <AppKitProvider>
-          <div className="relative flex min-h-screen flex-col">
-            <MainNav />
-            <main className="flex-1">
-              {children}
-            </main>
-          </div>
-          <Toaster />
+          <Onboarding />
+          {children}
         </AppKitProvider>
       </body>
     </html>

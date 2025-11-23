@@ -47,17 +47,12 @@ export async function PATCH(
       );
     }
 
-    // Calculate cooldown end (30 days from now)
-    const cooldownEnd = new Date();
-    cooldownEnd.setDate(cooldownEnd.getDate() + 30);
-
     // Update the connection status to rejected
     const [updatedConnection] = await db
       .update(connections)
       .set({ 
         status: 'rejected',
-        updatedAt: new Date(),
-        cooldownEnd
+        updatedAt: new Date()
       })
       .where(eq(connections.id, id))
       .returning();

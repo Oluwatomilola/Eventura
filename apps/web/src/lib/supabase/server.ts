@@ -22,6 +22,9 @@ export const createServerClient = () => {
       autoRefreshToken: false,
       persistSession: false,
     },
+    db: {
+      schema: 'public',
+    },
   })
 }
 
@@ -36,5 +39,9 @@ export const createClient = () => {
   }
 
   // Regular client for API routes (respects RLS)
-  return createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey)
+  return createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
+    db: {
+      schema: 'public',
+    },
+  })
 }

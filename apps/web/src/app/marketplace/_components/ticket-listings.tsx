@@ -53,9 +53,9 @@ export function TicketListings({ filter = 'all' }: { filter?: string }) {
     address: TICKET_MARKETPLACE_ADDRESS,
     abi: TicketMarketplaceABI,
     functionName: 'getListingDetails',
-    args: listingIds?.map((id) => id) || [],
+    args: (listingIds as any)?.map((id: any) => id) || [],
     query: {
-      enabled: !!listingIds?.length,
+      enabled: !!(listingIds as any)?.length,
     },
   }) as { data: TicketListing[] | undefined };
 

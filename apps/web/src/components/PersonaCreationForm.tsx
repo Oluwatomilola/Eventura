@@ -49,7 +49,7 @@ const VISIBILITY_OPTIONS = [
   {
     value: 'connections',
     label: 'Connections Only',
-    description: 'Only people you've connected with',
+    description: 'Only people you\'ve connected with',
     icon: '🤝'
   },
   {

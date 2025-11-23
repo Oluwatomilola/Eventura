@@ -25,7 +25,7 @@ export default function EventsPage() {
             { name: 'Home', item: siteConfig.url },
             { name: 'Events', item: `${siteConfig.url}/events` },
           ]),
-          ...events.slice(0, 6).map((event) => buildEventJsonLd(event)),
+          ...events.slice(0, 6).map((event) => buildEventJsonLd(event) as unknown as Record<string, unknown>),
         ]}
       />
 

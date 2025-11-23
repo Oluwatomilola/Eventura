@@ -2,7 +2,7 @@ import { TicketCard } from '@/components/TicketCard';
 
 export default function TicketsPage() {
   // In a real app, you would fetch the user's tickets here
-  const tickets = [];
+  const tickets: any[] = [];
 
   return (
     <div className="container mx-auto px-4 py-8">

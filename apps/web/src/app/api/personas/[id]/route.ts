@@ -78,7 +78,7 @@ export async function PATCH(
       )
     }
 
-    if (existingPersona.wallet_address !== wallet_address.toLowerCase()) {
+    if ((existingPersona as any).wallet_address !== wallet_address.toLowerCase()) {
       return NextResponse.json(
         { success: false, error: 'You can only update your own personas' },
         { status: 403 }
@@ -86,7 +86,16 @@ export async function PATCH(
     }
 
     // Build update object (only include provided fields)
-    const updateData: any = {
+    type PersonaUpdate = {
+      display_name?: string;
+      bio?: string | null;
+      interests?: string[];
+      looking_for?: string[];
+      visibility?: 'public' | 'attendees' | 'connections' | 'private';
+      updated_at?: string;
+    }
+    
+    const updateData: PersonaUpdate = {
       updated_at: new Date().toISOString()
     }
 
@@ -165,7 +174,7 @@ export async function PATCH(
     }
 
     // Update persona in database
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('event_personas')
       .update(updateData)
       .eq('id', personaId)
@@ -254,7 +263,7 @@ export async function DELETE(
       )
     }
 
-    if (existingPersona.wallet_address !== walletAddress.toLowerCase()) {
+    if ((existingPersona as any).wallet_address !== walletAddress.toLowerCase()) {
       return NextResponse.json(
         { success: false, error: 'You can only delete your own personas' },
         { status: 403 }
@@ -262,7 +271,7 @@ export async function DELETE(
     }
 
     // Delete persona from database
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('event_personas')
       .delete()
       .eq('id', personaId)

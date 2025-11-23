@@ -30,6 +30,9 @@ export const createPageMetadata = (options: CreatePageMetadataOptions): Metadata
 
   const canonicalUrl = canonical || getSiteUrl(path)
   const ogImages = images?.length ? images : [siteConfig.ogImage]
+  
+  // Map 'event' to 'website' as event is not a valid OpenGraph type in Next.js
+  const ogType = type === 'event' ? 'website' : type;
 
   return {
     title,
@@ -42,7 +45,7 @@ export const createPageMetadata = (options: CreatePageMetadataOptions): Metadata
       title,
       description,
       url: canonicalUrl,
-      type,
+      type: ogType,
       siteName: siteConfig.name,
       images: ogImages.map((url) => ({
         url,
