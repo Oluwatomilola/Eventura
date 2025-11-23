@@ -41,7 +41,7 @@ export function useEventCreation() {
 
       // Step 2: Execute transaction via wallet
       if (typeof window !== 'undefined' && window.ethereum) {
-        const txHash = await window.ethereum.request({
+        const txHash = await (window.ethereum as any).request({
           method: 'eth_sendTransaction',
           params: [
             {

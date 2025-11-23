@@ -1,6 +1,6 @@
 import { eq, and, or, isNull, gte } from 'drizzle-orm';
 import { db } from '@eventura/db';
-import { connections, ConnectionStatus } from '@eventura/db/schema';
+import { connections } from '@eventura/db/schema';
 
 export class DatabaseError extends Error {
   status: number;
@@ -42,10 +42,10 @@ export async function validateConnectionRequest(fromWallet: string, toWallet: st
     if (existingConnection.status === 'blocked') {
       throw new DatabaseError('You cannot send a connection request to this user', 403);
     }
-    if (['pending', 'accepted'].includes(existingConnection.status)) {
+    if (existingConnection.status && ['pending', 'accepted'].includes(existingConnection.status)) {
       throw new DatabaseError('A connection request already exists', 400);
     }
-    if (existingConnection.status === 'rejected') {
+    if (existingConnection.status === 'rejected' && existingConnection.updatedAt) {
       const cooldownEnd = existingConnection.updatedAt.getTime() + (30 * 24 * 60 * 60 * 1000);
       if (Date.now() < cooldownEnd) {
         const daysLeft = Math.ceil((cooldownEnd - Date.now()) / (1000 * 60 * 60 * 24));

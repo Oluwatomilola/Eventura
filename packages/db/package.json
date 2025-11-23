@@ -4,6 +4,20 @@
   "private": true,
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "default": "./dist/schema.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "default": "./dist/client.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -11,12 +25,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "drizzle-orm": "^0.29.3",
-    "pg": "^8.11.3"
+    "drizzle-orm": "^0.44.7",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "@types/pg": "^8.10.9",
+    "@types/pg": "^8.15.6",
     "typescript": "^5.0.0"
   }
 }

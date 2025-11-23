@@ -6,7 +6,6 @@ import { useAccount } from 'wagmi'
 import { useWallet } from '@/hooks/useWallet'
 import { ConnectButton } from '@/components/ConnectButton'
 import { EventCreationWizard } from '@/components/events/EventCreationWizard'
-import { ProtectedRouteGuard } from '@/components/auth/ProtectedRouteGuard'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Shield, Users, Zap } from 'lucide-react'
 

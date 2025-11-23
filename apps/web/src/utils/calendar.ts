@@ -28,7 +28,7 @@ export function formatEventDate(timestamp: bigint, language: LanguageCode = 'en'
       hour12: false,
     }).format(date);
   } catch {
-    return format(date, "EEE, MMM dd, yyyy, HH:mm");
+    return format(date, 'EEE, MMM dd, yyyy, HH:mm');
   }
 }
 
@@ -36,10 +36,7 @@ export function formatEventDate(timestamp: bigint, language: LanguageCode = 'en'
  * Generate ICS file content for calendar export
  * Compatible with Google Calendar, Apple Calendar, Outlook
  */
-export function generateICSFile(
-  event: EventWithMetadata,
-  language: LanguageCode = 'en'
-): string {
+export function generateICSFile(event: EventWithMetadata, language: LanguageCode = 'en'): string {
   const translation = getTranslation(event.metadata, language);
   const startDate = timestampToDate(event.startTime);
   const endDate = timestampToDate(event.endTime);
@@ -88,10 +85,7 @@ export function generateICSFile(
 /**
  * Download ICS file
  */
-export function downloadICSFile(
-  event: EventWithMetadata,
-  language: LanguageCode = 'en'
-): void {
+export function downloadICSFile(event: EventWithMetadata, language: LanguageCode = 'en'): void {
   const translation = getTranslation(event.metadata, language);
   const icsContent = generateICSFile(event, language);
 
@@ -191,9 +185,7 @@ export function eventsToCalendarFormat(
 /**
  * Group events by date
  */
-export function groupEventsByDate(
-  events: EventWithMetadata[]
-): Map<string, EventWithMetadata[]> {
+export function groupEventsByDate(events: EventWithMetadata[]): Map<string, EventWithMetadata[]> {
   const grouped = new Map<string, EventWithMetadata[]>();
 
   events.forEach((event) => {

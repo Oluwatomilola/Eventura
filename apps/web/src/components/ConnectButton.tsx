@@ -1,78 +1,42 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useAppKit } from '@reown/appkit/react'
-import { useAccount, useDisconnect } from 'wagmi'
-import { motion } from 'framer-motion'
-import { Wallet, LogOut, Copy, ExternalLink } from 'lucide-react'
-import { useState } from 'react'
+import { useAccount } from 'wagmi'
+import { Terminal } from 'lucide-react'
 import { cn } from '@/utils/cn'
+import { useOnboardingStore } from '@/store/useOnboardingStore'
 
 export function ConnectButton() {
   const { open } = useAppKit()
-  const { address, isConnected } = useAccount()
-  const { disconnect } = useDisconnect()
-  const [copied, setCopied] = useState(false)
+  const { isConnected } = useAccount()
+  const { markMilestone } = useOnboardingStore()
 
-  const copyAddress = async () => {
-    if (address) {
-      await navigator.clipboard.writeText(address)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+  useEffect(() => {
+    if (isConnected) {
+      markMilestone('wallet_connected')
     }
+  }, [isConnected, markMilestone])
+
+  if (isConnected) {
+    // Use the standard AppKit button for the connected state to get the profile modal
+    return <appkit-button />
   }
 
-  const formatAddress = (addr: string) => {
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`
-  }
-
-  if (isConnected && address) {
-    return (
-      <div className="flex items-center gap-2">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="flex items-center gap-2 bg-white/10 backdrop-blur-md rounded-xl px-4 py-2 border border-white/20"
-        >
-          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-          <span className="text-sm font-medium text-white">
-            {formatAddress(address)}
-          </span>
-          <button
-            onClick={copyAddress}
-            className="p-1 hover:bg-white/10 rounded-md transition-colors"
-            title="Copy address"
-          >
-            <Copy className="w-3 h-3 text-white/70" />
-          </button>
-        </motion.div>
-        
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => disconnect()}
-          className="p-2 bg-red-500/20 hover:bg-red-500/30 rounded-xl border border-red-500/30 transition-colors"
-          title="Disconnect"
-        >
-          <LogOut className="w-4 h-4 text-red-400" />
-        </motion.button>
-      </div>
-    )
-  }
-
+  // Custom Cyberpunk "Connect" button
   return (
-    <motion.button
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
+    <button
       onClick={() => open()}
       className={cn(
-        "flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all duration-200",
-        "bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700",
-        "text-white shadow-lg hover:shadow-xl",
-        "border border-white/20 backdrop-blur-sm"
+        "group relative overflow-hidden px-6 py-3 font-mono text-sm font-bold uppercase tracking-wider transition-all",
+        "bg-cyan-600 text-zinc-950 hover:bg-cyan-500",
+        "clip-path-button"
       )}
     >
-      <Wallet className="w-5 h-5" />
-      Connect Wallet
-    </motion.button>
+      <div className="flex items-center gap-3 relative z-10">
+        <Terminal className="w-4 h-4" />
+        <span>Connect_Wallet</span>
+      </div>
+    </button>
   )
 }

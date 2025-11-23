@@ -81,20 +81,20 @@ export function WaitlistManagement() {
     )
   }
 
-  if (waitlistEvents.length === 0) {
+    if (waitlistEvents.length === 0) {
     return (
-      <div className="bg-white/5 border border-white/10 rounded-lg p-12 text-center">
-        <Bell className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-white mb-2">No Waitlists</h3>
-        <p className="text-gray-300 mb-6">
-          You're not currently on any event waitlists
+      <div className="bg-zinc-900/50 border border-zinc-800 rounded-lg p-12 text-center">
+        <Bell className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
+        <h3 className="text-xl font-bold text-white mb-2 uppercase tracking-wide">No Active Waitlists</h3>
+        <p className="text-zinc-400 mb-8 font-mono text-sm">
+          Join waitlists for sold-out events to secure your spot in line.
         </p>
         <a
           href="/calendar"
-          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-zinc-950 font-bold font-mono uppercase tracking-wider transition-all"
         >
           <Calendar className="w-5 h-5" />
-          Browse Events
+          BROWSE_EVENTS
         </a>
       </div>
     )

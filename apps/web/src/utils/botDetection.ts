@@ -118,7 +118,7 @@ export function detectHeadlessBrowser(): { isHeadless: boolean; reasons: string[
   }
 
   // Check for missing properties that real browsers have
-  if (!window.chrome && navigator.userAgent.includes('Chrome')) {
+  if (!(window as any).chrome && navigator.userAgent.includes('Chrome')) {
     reasons.push('Missing chrome object')
   }
 

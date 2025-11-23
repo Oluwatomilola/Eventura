@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@eventura/db';
 import { connections } from '@eventura/db/schema';
 import { getCurrentUser } from '@/lib/session';
-import { validateConnectionRequest } from '@/lib/db-utils';
+import { validateConnectionRequest, DatabaseError } from '@/lib/db-utils';
 
 interface RequestBody {
   toWallet: string;

@@ -10,12 +10,12 @@
  * - Previous event attendance (NFT tickets)
  */
 
-import type { Address, PublicClient } from "viem";
-import type { EventWithMetadata } from "@/types/multilang-event";
-import { getEventCategory, getEventPrice, getEventId } from "./eventHelpers";
-import type { UserProfile } from "./recommendations";
-import { createPublicClient, http } from "viem";
-import { baseSepolia } from "viem/chains";
+import type { Address, PublicClient } from 'viem';
+import type { EventWithMetadata } from '@/types/multilang-event';
+import { getEventCategory, getEventPrice, getEventId } from './eventHelpers';
+import type { UserProfile } from './recommendations';
+import { createPublicClient, http } from 'viem';
+import { baseSepolia } from 'viem/chains';
 
 /**
  * Web3 user profile enrichment
@@ -49,7 +49,7 @@ export async function fetchUserNFTCollections(
     const collections: string[] = [];
     return collections;
   } catch (error) {
-    console.error("Error fetching NFT collections:", error);
+    console.error('Error fetching NFT collections:', error);
     return [];
   }
 }
@@ -67,7 +67,7 @@ export async function fetchAttendedEvents(
 
     return attendedEvents;
   } catch (error) {
-    console.error("Error fetching attended events:", error);
+    console.error('Error fetching attended events:', error);
     return [];
   }
 }
@@ -91,7 +91,7 @@ export async function calculateWeb3Score(
 
     return score;
   } catch (error) {
-    console.error("Error calculating Web3 score:", error);
+    console.error('Error calculating Web3 score:', error);
     return 0;
   }
 }
@@ -128,10 +128,7 @@ export function applyWeb3Boost(
   web3Profile: Web3Profile,
   baseScores: Map<string, number>
 ): Map<string, { score: number; reasons: string[] }> {
-  const enhancedScores = new Map<
-    string,
-    { score: number; reasons: string[] }
-  >();
+  const enhancedScores = new Map<string, { score: number; reasons: string[] }>();
 
   events.forEach((event) => {
     const eventId = getEventId(event);
@@ -141,7 +138,7 @@ export function applyWeb3Boost(
 
     if (web3Profile.interactionScore && web3Profile.interactionScore > 5) {
       boost += 1;
-      reasons.push("Active Web3 user");
+      reasons.push('Active Web3 user');
     }
 
     if (
@@ -149,12 +146,12 @@ export function applyWeb3Boost(
       web3Profile.nftCollections.includes(event.organizer.toLowerCase())
     ) {
       boost += 2;
-      reasons.push("From collection you own");
+      reasons.push('From collection you own');
     }
 
     if (web3Profile.attendedEvents?.length) {
       boost += 0.5;
-      reasons.push("Similar to events you attended");
+      reasons.push('Similar to events you attended');
     }
 
     const eventPrice = getEventPrice(event);
@@ -165,7 +162,7 @@ export function applyWeb3Boost(
       );
       if (totalValue > 1e18 && eventPrice > 100) {
         boost += 1;
-        reasons.push("Premium event match");
+        reasons.push('Premium event match');
       }
     }
 
@@ -189,17 +186,9 @@ export async function getWeb3Recommendations(
   baseRecommendations: Map<string, number>,
   eventContractAddress?: Address
 ) {
-  const web3Profile = await buildWeb3Profile(
-    address,
-    publicClient,
-    eventContractAddress
-  );
+  const web3Profile = await buildWeb3Profile(address, publicClient, eventContractAddress);
 
-  const enhancedScores = applyWeb3Boost(
-    allEvents,
-    web3Profile,
-    baseRecommendations
-  );
+  const enhancedScores = applyWeb3Boost(allEvents, web3Profile, baseRecommendations);
 
   return Array.from(enhancedScores.entries())
     .map(([eventId, { score, reasons }]) => ({
@@ -224,7 +213,7 @@ export async function canAffordEvent(
 
     return balance >= priceWithGas;
   } catch (error) {
-    console.error("Error checking affordability:", error);
+    console.error('Error checking affordability:', error);
     return false;
   }
 }

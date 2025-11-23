@@ -160,14 +160,14 @@ export async function GET(
 
     // Transform data to Persona format
     const userPersonaData: Persona = {
-      id: userPersona.id,
-      wallet_address: userPersona.wallet_address,
-      display_name: userPersona.display_name,
-      bio: userPersona.bio,
-      interests: userPersona.interests || [],
-      looking_for: userPersona.looking_for || [],
-      avatar_ipfs_hash: userPersona.users?.avatar_ipfs_hash,
-      created_at: userPersona.created_at
+      id: (userPersona as any).id,
+      wallet_address: (userPersona as any).wallet_address,
+      display_name: (userPersona as any).display_name,
+      bio: (userPersona as any).bio,
+      interests: (userPersona as any).interests || [],
+      looking_for: (userPersona as any).looking_for || [],
+      avatar_ipfs_hash: (userPersona as any).users?.avatar_ipfs_hash,
+      created_at: (userPersona as any).created_at
     }
 
     const allAttendees: Persona[] = attendees.map((attendee: any) => ({

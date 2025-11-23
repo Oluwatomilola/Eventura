@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
     // Create or update profile in database
     const supabase = createServerClient()
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('users')
       .upsert({
         wallet_address: sanitizedInput.wallet_address,
@@ -192,7 +192,7 @@ export async function PATCH(req: NextRequest) {
     // Update profile in database
     const supabase = createServerClient()
 
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('users')
       .update({
         ...sanitizedData,

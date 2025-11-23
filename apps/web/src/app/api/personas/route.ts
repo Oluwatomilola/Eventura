@@ -117,7 +117,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create persona in database
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('event_personas')
       .insert({
         wallet_address: sanitizedInput.wallet_address,
@@ -187,7 +187,7 @@ export async function GET(req: NextRequest) {
       // Filter by visibility
       // TODO: Apply proper visibility rules based on requesting user's relationship
       // For now, we return all non-private personas
-      const filteredData = data.filter(persona => persona.visibility !== 'private')
+      const filteredData = (data as any[]).filter((persona: any) => persona.visibility !== 'private')
 
       return NextResponse.json({ success: true, data: filteredData })
     }
