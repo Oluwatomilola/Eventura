@@ -238,41 +238,67 @@ export function TicketCard({
           </div>
 
           {/* QR Code Section */}
-          {showQR && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mb-4 p-4 bg-white rounded-none border-2 border-white flex flex-col items-center"
-            >
-              <QRCodeSVG
-                id={`qr-${ticket.ticketId}`}
-                value={qrData}
-                size={200}
-                level="H"
-                includeMargin={false}
-              />
-              <p className="text-[10px] font-mono text-black mt-2 text-center uppercase tracking-widest">
-                Scan for Entry Verification
-              </p>
-              <button
-                onClick={handleDownloadQR}
-                className="mt-3 flex items-center gap-2 px-4 py-2 bg-black text-white text-xs font-mono uppercase hover:bg-zinc-800 transition-colors w-full justify-center"
+          <div role="region" aria-live="polite" aria-atomic="true">
+            {showQR && (
+              <motion.div
+                initial={{ opacity: 0, height: 0, overflow: 'hidden' }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="mb-4 p-4 bg-white rounded-none border-2 border-white flex flex-col items-center focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-zinc-950"
+                tabIndex={-1}
+                aria-labelledby={`qr-title-${ticket.ticketId}`}
               >
-                <Download className="w-3 h-3" />
-                Save_IMG
-              </button>
-            </motion.div>
-          )}
+                <QRCodeSVG
+                  id={`qr-${ticket.ticketId}`}
+                  value={qrData}
+                  size={200}
+                  level="H"
+                  includeMargin={false}
+                  aria-label={`QR Code for ticket #${ticket.ticketId}`}
+                  role="img"
+                />
+                <p 
+                  id={`qr-title-${ticket.ticketId}`}
+                  className="text-[10px] font-mono text-black mt-2 text-center uppercase tracking-widest"
+                >
+                  Scan for Entry Verification
+                </p>
+                <button
+                  onClick={handleDownloadQR}
+                  className="mt-3 flex items-center gap-2 px-4 py-2 bg-black text-white text-xs font-mono uppercase hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transition-colors w-full justify-center"
+                  aria-label={`Download QR code for ticket #${ticket.ticketId}`}
+                >
+                  <Download className="w-3 h-3" aria-hidden="true" />
+                  <span>Save_IMG</span>
+                </button>
+              </motion.div>
+            )}
+          </div>
 
           {/* Actions */}
           <div className="grid grid-cols-2 gap-3">
             <button
-              onClick={() => setShowQR(!showQR)}
-              className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold font-mono uppercase tracking-wider border border-zinc-700 hover:border-zinc-500 transition-all"
+              onClick={() => {
+                setShowQR(!showQR);
+                // Focus on the QR code when shown for better keyboard navigation
+                if (!showQR) {
+                  setTimeout(() => {
+                    const qrElement = document.getElementById(`qr-${ticket.ticketId}`)?.parentElement;
+                    if (qrElement) {
+                      qrElement.setAttribute('tabindex', '-1');
+                      qrElement.focus();
+                    }
+                  }, 100);
+                }
+              }}
+              className="flex items-center justify-center gap-2 px-4 py-3 bg-zinc-800 hover:bg-zinc-700 text-white text-xs font-bold font-mono uppercase tracking-wider border border-zinc-700 hover:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 focus:ring-offset-zinc-950 transition-all"
+              aria-expanded={showQR}
+              aria-controls={`qr-${ticket.ticketId}`}
+              aria-label={`${showQR ? 'Hide' : 'Show'} QR code for ticket #${ticket.ticketId}`}
             >
-              <QrCode className="w-3 h-3" />
-              {showQR ? 'Hide' : 'Show'}_QR
+              <QrCode className="w-3 h-3" aria-hidden="true" />
+              <span>{showQR ? 'Hide' : 'Show'}_QR</span>
             </button>
 
             <Link
