@@ -11,8 +11,8 @@ import {
   clearRecommendationCache,
   type UserInteraction,
   type UserProfile,
-  type EventWithMetadata,
 } from '../../src/lib/recommendations'
+import type { EventWithMetadata } from '../../src/types/multilang-event'
 
 // Mock the event helpers
 vi.mock('../../src/lib/eventHelpers', () => ({
@@ -29,14 +29,14 @@ const mockGetEventPrice = vi.mocked(require('../../src/lib/eventHelpers').getEve
 
 describe('Recommendations System', () => {
   const mockEvent: EventWithMetadata = {
-    id: 'event-1',
+    id: 1n,
     startTime: 1704067200n,
     endTime: 1704074400n,
     ticketPrice: 1000000000000000000n, // 1 ETH
     maxTickets: 100n,
     ticketsSold: 25n,
     metadata: {
-      en: {
+      [1]: {
         name: 'Test Event',
         description: 'Test description',
         category: 'conference',
@@ -153,7 +153,7 @@ describe('Recommendations System', () => {
         {
           userId: 'user-1',
           eventId: 'event-5',
-          type: 'view',
+          type: 'view' as const,
           timestamp: Date.now(),
           metadata: {
             category: 'conference',
