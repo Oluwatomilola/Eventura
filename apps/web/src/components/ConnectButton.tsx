@@ -7,6 +7,15 @@ import { Terminal } from 'lucide-react'
 import { cn } from '@/utils/cn'
 import { useOnboardingStore } from '@/store/useOnboardingStore'
 
+/**
+ * ConnectButton Component
+ *
+ * Integrates REOWN AppKit wallet connection.
+ * - Shows custom connect button when disconnected
+ * - Shows REOWN account button when connected
+ * - Tracks wallet connection milestone for onboarding
+ */
+
 export function ConnectButton() {
   const { open } = useAppKit()
   const { isConnected } = useAccount()
@@ -19,11 +28,12 @@ export function ConnectButton() {
   }, [isConnected, markMilestone])
 
   if (isConnected) {
-    // Use the standard AppKit button for the connected state to get the profile modal
-    return <appkit-button />
+    // Use REOWN AppKit account button for connected state
+    // Provides access to account management, balance, and disconnect
+    return <appkit-account-button balance="show" />
   }
 
-  // Custom Cyberpunk "Connect" button
+  // Custom Cyberpunk "Connect" button for disconnected state
   return (
     <button
       onClick={() => open()}

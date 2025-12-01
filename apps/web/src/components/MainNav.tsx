@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ConnectButton } from './ConnectButton';
+import { NetworkSwitcher } from './NetworkSwitcher';
 
 export function MainNav() {
   const pathname = usePathname();
@@ -57,8 +58,9 @@ export function MainNav() {
           ))}
         </nav>
         
-        {/* Desktop Connect Button */}
-        <div className="hidden md:ml-auto md:flex md:items-center md:space-x-4">
+        {/* Desktop Actions */}
+        <div className="hidden md:ml-auto md:flex md:items-center md:space-x-3">
+          <NetworkSwitcher />
           <ConnectButton />
         </div>
       </div>
@@ -77,7 +79,8 @@ export function MainNav() {
               {route.label}
             </Link>
           ))}
-          <div className="pt-4 border-t border-gray-200">
+          <div className="pt-4 border-t border-gray-200 flex flex-col gap-3">
+            <NetworkSwitcher />
             <ConnectButton />
           </div>
         </nav>
