@@ -1,4 +1,14 @@
 import { Resend } from 'resend';
+import * as React from 'react';
+import { ConnectionRequestEmail } from '@/emails/connection-request';
+import { ConnectionAcceptedEmail } from '@/emails/connection-accepted';
+import { NewMessageEmail } from '@/emails/new-message';
+import { EventReminderEmail } from '@/emails/event-reminder';
+import { WaitlistAvailableEmail } from '@/emails/waitlist-available';
+import { EventCancelledEmail } from '@/emails/event-cancelled';
+import { EventAnnouncementEmail } from '@/emails/event-announcement';
+import { WaitlistAvailableEmail } from '@/emails/waitlist-available';
+import { WelcomeEmail } from '@/emails/welcome';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -61,6 +71,11 @@ export const emailTemplates = {
   eventCancelled: (eventName: string) => ({
     subject: `[Eventura] ${eventName} has been cancelled`,
     react: <EventCancelledEmail eventName={eventName} />,
+  }),
+  
+  eventAnnouncement: (eventName: string, title: string, message: string, eventId?: string) => ({
+    subject: `[Eventura] ${eventName}: ${title}`,
+    react: <EventAnnouncementEmail eventName={eventName} title={title} message={message} eventId={eventId} />,
   }),
   
   welcome: (userName: string) => ({

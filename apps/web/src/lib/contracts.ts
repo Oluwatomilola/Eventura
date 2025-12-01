@@ -85,6 +85,12 @@ export const EventTicketingABI = [
   { type: 'function', name: 'isSoldOut', stateMutability: 'view', inputs: [{ name: 'eventId', type: 'uint256' }], outputs: [{ type: 'bool' }] },
   // getAvailableTickets(uint256 eventId)
   { type: 'function', name: 'getAvailableTickets', stateMutability: 'view', inputs: [{ name: 'eventId', type: 'uint256' }], outputs: [{ type: 'uint256' }] },
+  // getOrganizerEvents(address organizer)
+  { type: 'function', name: 'getOrganizerEvents', stateMutability: 'view', inputs: [{ name: 'organizer', type: 'address' }], outputs: [{ type: 'uint256[]' }] },
+  // cancelEvent(uint256 eventId)
+  { type: 'function', name: 'cancelEvent', stateMutability: 'nonpayable', inputs: [{ name: 'eventId', type: 'uint256' }], outputs: [] },
+  // getWaitlistCount(uint256 eventId)
+  { type: 'function', name: 'getWaitlistCount', stateMutability: 'view', inputs: [{ name: 'eventId', type: 'uint256' }], outputs: [{ type: 'uint256' }] },
 ] as const;
 
 export const EventFactoryABI = [
@@ -151,4 +157,6 @@ export const EventFactoryABI = [
   },
   // getTotalEvents() view returns (uint256)
   { type: 'function', name: 'getTotalEvents', stateMutability: 'view', inputs: [], outputs: [{ type: 'uint256' }] },
+  // getOrganizerEvents(address organizer)
+  { type: 'function', name: 'getOrganizerEvents', stateMutability: 'view', inputs: [{ name: 'organizer', type: 'address' }], outputs: [{ type: 'uint256[]' }] },
 ] as const;

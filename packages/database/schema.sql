@@ -116,7 +116,7 @@ CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(from_wallet, to
 CREATE TABLE IF NOT EXISTS notifications (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_wallet TEXT NOT NULL REFERENCES users(wallet_address) ON DELETE CASCADE,
-  type TEXT NOT NULL CHECK (type IN ('connection_request', 'connection_accepted', 'connection_rejected', 'new_message', 'event_reminder', 'waitlist_available', 'event_cancelled', 'system')),
+  type TEXT NOT NULL CHECK (type IN ('connection_request', 'connection_accepted', 'connection_rejected', 'new_message', 'event_reminder', 'waitlist_available', 'event_cancelled', 'event_announcement', 'system')),
   title TEXT NOT NULL,
   message TEXT NOT NULL,
   link TEXT,
@@ -124,6 +124,26 @@ CREATE TABLE IF NOT EXISTS notifications (
   read_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- ============================================
+-- CHECK_INS TABLE
+-- Stores ticket check-in records for events
+-- ============================================
+CREATE TABLE IF NOT EXISTS check_ins (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  event_id BIGINT NOT NULL,
+  ticket_id BIGINT NOT NULL,
+  wallet_address TEXT NOT NULL REFERENCES users(wallet_address) ON DELETE CASCADE,
+  checked_in_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  checked_in_by TEXT, -- Organizer wallet address who checked them in
+  UNIQUE(event_id, ticket_id)
+);
+
+-- Indexes for check-ins
+CREATE INDEX IF NOT EXISTS idx_check_ins_event ON check_ins(event_id);
+CREATE INDEX IF NOT EXISTS idx_check_ins_wallet ON check_ins(wallet_address);
+CREATE INDEX IF NOT EXISTS idx_check_ins_ticket ON check_ins(ticket_id);
+CREATE INDEX IF NOT EXISTS idx_check_ins_created_at ON check_ins(checked_in_at DESC);
 
 -- Indexes for performance
 CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_wallet);
@@ -145,6 +165,7 @@ ALTER TABLE event_personas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE connections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE check_ins ENABLE ROW LEVEL SECURITY;
 
 -- ============================================
 -- USERS TABLE POLICIES
@@ -291,6 +312,25 @@ CREATE POLICY "Users can update their notifications"
 CREATE POLICY "Users can delete their notifications"
   ON notifications FOR DELETE
   USING (user_wallet = auth.uid()::text);
+
+-- ============================================
+-- CHECK_INS TABLE POLICIES
+-- ============================================
+
+-- Organizers can view check-ins for their events (will be verified server-side)
+CREATE POLICY "Organizers can view check-ins for their events"
+  ON check_ins FOR SELECT
+  USING (true); -- Server-side verification of organizer status
+
+-- Service role can create check-ins (server-side only)
+CREATE POLICY "Service can create check-ins"
+  ON check_ins FOR INSERT
+  WITH CHECK (true);
+
+-- Users can view their own check-ins
+CREATE POLICY "Users can view their own check-ins"
+  ON check_ins FOR SELECT
+  USING (wallet_address = auth.uid()::text);
 
 -- ============================================
 -- FUNCTIONS AND TRIGGERS
