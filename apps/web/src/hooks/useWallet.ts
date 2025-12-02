@@ -1,6 +1,6 @@
 import { useAccount, useBalance, useChainId, useSwitchChain, useDisconnect } from 'wagmi'
 import { base, baseSepolia } from 'viem/chains'
-import { useAppKit, useAppKitState, useAppKitEvents } from '@reown/appkit/react'
+import { useAppKit, useAppKitState } from '@reown/appkit/react'
 
 /**
  * useWallet Hook
