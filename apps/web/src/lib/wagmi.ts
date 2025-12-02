@@ -1,7 +1,6 @@
 import { createAppKit } from '@reown/appkit/react'
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi'
-import { base, baseSepolia } from 'viem/chains'
-import { coinbaseWallet, walletConnect, injected } from 'wagmi/connectors'
+import { base, baseSepolia } from '@reown/appkit/networks'
 
 // 1. Get projectId from https://cloud.reown.com
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!
@@ -10,7 +9,8 @@ if (!projectId) {
   throw new Error('NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is not defined in environment variables')
 }
 
-// 2. Set up Wagmi adapter with EIP-6963 support
+// 2. Set up Wagmi adapter with proper configuration
+// WagmiAdapter automatically configures WalletConnect, Coinbase, and Injected connectors
 const wagmiAdapter = new WagmiAdapter({
   networks: [base, baseSepolia],
   projectId,
@@ -25,7 +25,7 @@ const metadata = {
   icons: ['https://avatars.githubusercontent.com/u/eventura']
 }
 
-// 4. Create AppKit with enhanced features
+// 4. Create AppKit with proper configuration
 export const appKit = createAppKit({
   adapters: [wagmiAdapter],
   networks: [base, baseSepolia],
@@ -51,12 +51,7 @@ export const appKit = createAppKit({
     '--w3m-border-radius-master': '12px',
     '--w3m-font-size-master': '10px',
     '--w3m-z-index': 9999
-  },
-  // Enable all wallet detection methods
-  enableCoinbase: true,
-  enableInjected: true,
-  enableWalletConnect: true,
-  enableEIP6963: true
+  }
 })
 
 export const wagmiConfig = wagmiAdapter.wagmiConfig
