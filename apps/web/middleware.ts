@@ -6,14 +6,14 @@ import { randomBytes } from 'crypto';
 const csrfTokens = new Map<string, { token: string; expires: number }>();
 
 // Generate a secure random token
-generateCsrfToken(): string {
+function generateCsrfToken(): string {
   return randomBytes(32).toString('hex');
 }
 
 // Middleware function
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next();
-  
+
   // Skip CSRF for public assets and API routes that don't need it
   if (
     request.nextUrl.pathname.startsWith('/_next/') ||
@@ -45,13 +45,13 @@ export async function middleware(request: NextRequest) {
   // Handle CSRF token for non-GET requests
   if (request.method !== 'GET') {
     const csrfToken = request.headers.get('x-csrf-token') || request.nextUrl.searchParams.get('_csrf');
-    
+
     if (!csrfToken) {
       return new NextResponse('CSRF token is missing', { status: 403 });
     }
 
     const sessionData = sessionId ? csrfTokens.get(sessionId) : null;
-    
+
     if (!sessionData || sessionData.token !== csrfToken) {
       return new NextResponse('Invalid CSRF token', { status: 403 });
     }
@@ -69,7 +69,7 @@ export async function middleware(request: NextRequest) {
       token: newToken,
       expires: Date.now() + 3600000, // 1 hour expiration
     });
-    
+
     // Add CSRF token to response headers
     response.headers.set('x-csrf-token', newToken);
   }
