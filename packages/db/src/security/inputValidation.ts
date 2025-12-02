@@ -9,10 +9,10 @@ export class InputValidationError extends Error {
 }
 
 export function validateWalletAddress(address: string): string {
-  if (!ethers.utils.isAddress(address)) {
+  if (!ethers.isAddress(address)) {
     throw new InputValidationError('Invalid wallet address');
   }
-  return ethers.utils.getAddress(address); // Convert to checksum address
+  return ethers.getAddress(address); // Convert to checksum address
 }
 
 export function sanitizeHtml(html: string): string {
@@ -56,7 +56,7 @@ export function validateInterests(interests: string[]): string[] {
   if (!Array.isArray(interests)) {
     throw new InputValidationError('Interests must be an array');
   }
-  
+
   return interests.map(interest => {
     const sanitized = sanitizeText(interest).trim();
     if (sanitized.length < 2 || sanitized.length > 50) {
