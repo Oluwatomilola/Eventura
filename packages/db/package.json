@@ -23,7 +23,8 @@
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "typecheck": "tsc --noEmit",
-    "audit": "npm audit --production"
+    "audit": "npm audit --production",
+    "seed": "tsx src/seed.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.44.7",
@@ -34,6 +35,7 @@
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@types/pg": "^8.15.6",
+    "tsx": "^4.7.0",
     "typescript": "^5.0.0"
   }
 }
