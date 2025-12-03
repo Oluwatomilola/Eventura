@@ -5,7 +5,13 @@ import { AppKitProvider } from '@/components/providers/AppkitProviders'
 import { WebVitals } from './web-vitals'
 import { Onboarding } from '@/components/Onboarding'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true,
+  fallback: ['system-ui', 'arial'],
+  adjustFontFallback: true,
+})
 
 export const metadata: Metadata = {
   title: 'Eventura - Decentralized Event Ticketing',
