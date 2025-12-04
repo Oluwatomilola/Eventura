@@ -4,6 +4,7 @@ import './globals.css'
 import { AppKitProvider } from '@/components/providers/AppkitProviders'
 import { WebVitals } from './web-vitals'
 import { Onboarding } from '@/components/Onboarding'
+import { Toaster } from 'react-hot-toast'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -32,6 +33,29 @@ export default function RootLayout({
       <body className={`${inter.className} min-h-screen bg-background`}>
         <WebVitals />
         <AppKitProvider>
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: 'var(--background)',
+                color: 'var(--foreground)',
+                border: '1px solid var(--border)',
+              },
+              success: {
+                iconTheme: {
+                  primary: '#10b981',
+                  secondary: 'white',
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: '#ef4444',
+                  secondary: 'white',
+                },
+              },
+            }}
+          />
           <Onboarding />
           {children}
         </AppKitProvider>
