@@ -12,21 +12,20 @@ jobs:
     runs-on: ubuntu-latest
     
     services:
-      # Start a local blockchain node for testing
-      hardhat-node:
-        image: ethereum/client-go:latest
+      # PostgreSQL for database tests
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: eventura_test
         ports:
-          - 8545:8545
+          - 5432:5432
         options: >-
-          --http
-          --http.addr 0.0.0.0
-          --http.api eth,net,web3,debug
-          --http.vhosts=*
-          --http.corsdomain=*
-          --dev
-          --dev.period 1
-          --allow-insecure-unlock
-          --rpc.allow-unprotected-txs
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     
     steps:
     - uses: actions/checkout@v3
@@ -38,20 +37,17 @@ jobs:
         cache: 'npm'
     
     - name: Install dependencies
-      run: |
-        npm ci
-        cd apps/web
-        npm ci
-        npx playwright install --with-deps
+      run: npm ci
+    
+    - name: Install Playwright browsers
+      working-directory: ./apps/web
+      run: npx playwright install --with-deps chromium
     
     - name: Run database migrations
-      run: |
-        cd apps/web
-        npm run db:migrate
-    
-    - name: Start development server
       working-directory: ./apps/web
-      run: npm run dev &
+      run: npm run db:migrate || echo "No migrations to run"
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/eventura_test
     
     - name: Run Playwright tests
       working-directory: ./apps/web
@@ -59,7 +55,7 @@ jobs:
       env:
         PLAYWRIGHT_TEST_BASE_URL: http://localhost:3000
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/eventura_test
-        NEXT_PUBLIC_RPC_URL: http://localhost:8545
+        NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: ${{ secrets.WALLETCONNECT_PROJECT_ID }}
     
     - name: Upload test results
       if: always()

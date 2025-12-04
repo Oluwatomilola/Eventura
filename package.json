@@ -17,7 +17,8 @@
     "clean": "turbo run clean",
     "contracts:compile": "cd packages/contracts && npm run compile",
     "contracts:deploy": "cd packages/contracts && npm run deploy",
-    "contracts:test": "cd packages/contracts && npm run test"
+    "contracts:test": "cd packages/contracts && npm run test",
+    "prepare": "husky"
   },
   "dependencies": {
     "@prisma/client": "^7.0.0",
@@ -29,11 +30,23 @@
     "qrcode": "^1.5.4"
   },
   "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prettier": "^3.0.0",
     "turbo": "^2.6.0"
   },
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
+  },
+  "lint-staged": {
+    "apps/web/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "bash -c 'cd apps/web && tsc --noEmit'"
+    ],
+    "packages/**/*.{ts,tsx}": [
+      "eslint --fix",
+      "bash -c 'tsc --noEmit --project tsconfig.json'"
+    ]
   }
 }
