@@ -250,7 +250,7 @@ export async function GET(req: NextRequest) {
     // Mark unread messages as read
     await supabase
       .from('messages')
-      .update({ read_at: new Date().toISOString() })
+      .update({ read_at: new Date().toISOString() } as any)
       .eq('to_wallet', wallet)
       .eq('from_wallet', otherWallet)
       .is('read_at', null)
