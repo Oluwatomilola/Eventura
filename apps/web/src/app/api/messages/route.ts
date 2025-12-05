@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
           message_id: newMessage.id,
           from_wallet: sanitizedInput.from_wallet
         }
-      })
+      } as any)
 
     return NextResponse.json(
       { success: true, data: newMessage },
