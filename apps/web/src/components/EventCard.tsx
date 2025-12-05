@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect, useCallback, memo } from 'react'
+import { useState, useEffect } from 'react'
 import { useAccount, useWalletClient, usePublicClient } from 'wagmi'
-import { motion } from 'framer-motion'
-import { Calendar, MapPin, Users, Ticket, ExternalLink, Clock } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Calendar, MapPin, Users, Ticket, ExternalLink, Clock, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import type { EventWithMetadata, LanguageCode } from '@/types/multilang-event'
 import { getTranslation, detectUserLanguage } from '@/utils/multilang'
@@ -12,25 +12,60 @@ import { HCaptcha } from './HCaptcha'
 import { rateLimitWallet } from '@/utils/rateLimit'
 import { detectBot } from '@/utils/botDetection'
 import { parseEther } from 'viem'
+import { useOnboardingStore } from '@/store/useOnboardingStore'
 
-// TODO: Update with actual deployed contract address on Base L2
 const EVENT_TICKETING_ADDRESS = process.env.NEXT_PUBLIC_EVENT_TICKETING_ADDRESS || '0x0000000000000000000000000000000000000000'
 
 interface EventCardProps {
-  event: EventWithMetadata
+  event: EventWithMetadata | null
   language?: LanguageCode
   onPurchaseSuccess?: (ticketId: bigint) => void
   compact?: boolean
+  isLoading?: boolean
+  skeletonCount?: number
 }
 
-import { useOnboardingStore } from '@/store/useOnboardingStore'
+export function EventCardSkeleton({ compact = false }: { compact?: boolean }) {
+  return (
+    <div className={`flex flex-col bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden ${compact ? '' : 'h-full'}`}>
+      <div className="relative h-40 sm:h-48 overflow-hidden bg-white/10"></div>
+      <div className="p-4 md:p-6 flex-1 flex flex-col">
+        <div className="h-7 w-3/4 bg-white/10 rounded mb-3"></div>
+        <div className="space-y-2 mb-4">
+          <div className="h-4 bg-white/10 rounded w-3/4"></div>
+          <div className="h-4 bg-white/10 rounded w-1/2"></div>
+        </div>
+        <div className="mt-auto pt-4">
+          <div className="h-10 w-full bg-white/10 rounded"></div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export function EventCardSkeletonList({ count = 4, compact = false }: { count?: number, compact?: boolean }) {
+  return (
+    <div className={`${compact ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'} grid gap-6`}>
+      {Array.from({ length: count }).map((_, i) => (
+        <EventCardSkeleton key={i} compact={compact} />
+      ))}
+    </div>
+  )
+}
 
 export function EventCard({
   event,
   language = detectUserLanguage(),
   onPurchaseSuccess,
-  compact = false
+  compact = false,
+  isLoading = false,
+  skeletonCount = 4
 }: EventCardProps) {
+  // If loading, return skeleton
+  if (isLoading || !event) {
+    return <EventCardSkeletonList count={skeletonCount} compact={compact} />
+  }
+
   const { address, isConnected } = useAccount()
   const { data: walletClient } = useWalletClient()
   const publicClient = usePublicClient()
@@ -40,8 +75,6 @@ export function EventCard({
   const [showPurchaseModal, setShowPurchaseModal] = useState(false)
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  
-  // Tooltip state for first time viewing
   const [showDetailTooltip, setShowDetailTooltip] = useState(false)
 
   useEffect(() => {
@@ -57,13 +90,9 @@ export function EventCard({
   }
 
   const translation = getTranslation(event.metadata, language)
-
-  // Calculate availability
   const soldOut = event.ticketsSold >= event.maxTickets
   const availableTickets = event.maxTickets - event.ticketsSold
   const percentageSold = (Number(event.ticketsSold) / Number(event.maxTickets)) * 100
-
-  // Check if event has started or ended
   const now = Date.now() / 1000
   const hasStarted = now >= Number(event.startTime)
   const hasEnded = now >= Number(event.endTime)
@@ -74,10 +103,7 @@ export function EventCard({
       return
     }
 
-    if (soldOut) {
-      return // Show waitlist button instead
-    }
-
+    if (soldOut) return
     if (hasStarted) {
       alert('Event has already started')
       return
@@ -101,37 +127,21 @@ export function EventCard({
     setError(null)
 
     try {
-      // Bot detection
       const botCheck = detectBot()
       if (botCheck.isBot && botCheck.confidence > 70) {
         throw new Error('Automated access detected')
       }
 
-      // Rate limiting check
       const rateLimit = await rateLimitWallet(address, 'purchase')
       if (!rateLimit.success) {
         throw new Error(`Rate limit exceeded. Please try again in ${Math.ceil((rateLimit.reset - Date.now()) / 1000)} seconds`)
       }
 
-      // TODO: Replace with actual contract call
-      // const hash = await walletClient.writeContract({
-      //   address: EVENT_TICKETING_ADDRESS,
-      //   abi: EventTicketingABI,
-      //   functionName: 'purchaseTicket',
-      //   args: [event.id],
-      //   value: event.ticketPrice
-      // })
-      //
-      // const receipt = await publicClient.waitForTransactionReceipt({ hash })
-      // const ticketId = receipt.logs[0].topics[1] // Extract ticket ID from event
-
       // Mock success for development
       await new Promise(resolve => setTimeout(resolve, 2000))
       const mockTicketId = BigInt(Math.floor(Math.random() * 1000))
       
-      // Track milestone
       markMilestone('first_ticket_purchased')
-
       setShowPurchaseModal(false)
       onPurchaseSuccess?.(mockTicketId)
       alert(`Ticket purchased successfully! Ticket ID: ${mockTicketId}`)
@@ -145,11 +155,15 @@ export function EventCard({
   }
 
   return (
-    <>
+    <AnimatePresence>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className={`flex flex-col bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:border-white/20 hover:shadow-lg transition-all ${compact ? '' : 'h-full'}`}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.3 }}
+        className={`flex flex-col bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:border-white/20 hover:shadow-lg transition-all ${
+          compact ? '' : 'h-full'
+        }`}
       >
         {/* Event Image */}
         {event.metadata.media?.coverImage && (
@@ -260,11 +274,20 @@ export function EventCard({
                   ) : (
                     <button
                       onClick={handlePurchaseClick}
-                      disabled={!isConnected || hasStarted}
-                      className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all"
+                      disabled={!isConnected || hasStarted || purchasing}
+                      className="flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-all min-w-[120px]"
                     >
-                      <Ticket className="w-4 h-4" />
-                      {hasStarted ? 'Started' : isConnected ? 'Buy Ticket' : 'Connect Wallet'}
+                      {purchasing ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Processing...
+                        </>
+                      ) : (
+                        <>
+                          <Ticket className="w-4 h-4" />
+                          {hasStarted ? 'Started' : isConnected ? 'Buy Ticket' : 'Connect Wallet'}
+                        </>
+                      )}
                     </button>
                   )}
                 </>
@@ -279,12 +302,11 @@ export function EventCard({
                     <h4 className="text-cyan-500 font-mono text-xs uppercase tracking-wider mb-2">System Hint</h4>
                     <p className="text-xs text-zinc-300 mb-3">Inspect event parameters and attendee manifests here.</p>
                     <button 
-                      onClick={(e) => { e.preventDefault(); dismissTooltip(); }}
+                      onClick={(e) => { e.preventDefault(); dismissTooltip() }}
                       className="text-xs font-mono uppercase text-white border-b border-white/50 hover:border-white"
                     >
                       Acknowledge
                     </button>
-                    {/* Triangle pointer */}
                     <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-cyan-500" />
                   </div>
                 )}
@@ -297,72 +319,75 @@ export function EventCard({
       </motion.div>
 
       {/* Purchase Modal */}
-      {showPurchaseModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-slate-800 rounded-lg max-w-md w-full p-6 border border-white/20"
-          >
-            <h3 className="text-2xl font-bold text-white mb-4">Confirm Purchase</h3>
+      <AnimatePresence>
+        {showPurchaseModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-slate-800 rounded-lg max-w-md w-full p-6 border border-white/20"
+            >
+              <h3 className="text-2xl font-bold text-white mb-4">Confirm Purchase</h3>
 
-            <div className="space-y-4 mb-6">
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-400">Event:</span>
-                <span className="text-white font-medium">{translation.name}</span>
+              <div className="space-y-4 mb-6">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Event:</span>
+                  <span className="text-white font-medium">{translation.name}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Price:</span>
+                  <span className="text-white font-medium">{(Number(event.ticketPrice) / 1e18).toFixed(4)} ETH</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Your Wallet:</span>
+                  <span className="text-white font-mono text-xs">{address?.slice(0, 6)}...{address?.slice(-4)}</span>
+                </div>
               </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-400">Price:</span>
-                <span className="text-white font-medium">{(Number(event.ticketPrice) / 1e18).toFixed(4)} ETH</span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-400">Your Wallet:</span>
-                <span className="text-white font-mono text-xs">{address?.slice(0, 6)}...{address?.slice(-4)}</span>
-              </div>
-            </div>
 
-            {/* CAPTCHA */}
-            <div className="mb-6">
-              <HCaptcha
-                siteKey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || 'mock-key'}
-                onVerify={setCaptchaToken}
-                theme="dark"
-                required
-              />
-            </div>
-
-            {error && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded text-red-400 text-sm">
-                {error}
+              {/* CAPTCHA */}
+              <div className="mb-6">
+                <HCaptcha
+                  siteKey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || 'mock-key'}
+                  onVerify={setCaptchaToken}
+                  theme="dark"
+                  required
+                />
               </div>
-            )}
 
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowPurchaseModal(false)}
-                disabled={purchasing}
-                className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handlePurchase}
-                disabled={purchasing || !captchaToken}
-                className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {purchasing ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    Processing...
-                  </span>
-                ) : (
-                  'Confirm Purchase'
-                )}
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      )}
-    </>
+              {error && (
+                <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded text-red-400 text-sm">
+                  {error}
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowPurchaseModal(false)}
+                  disabled={purchasing}
+                  className="flex-1 px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handlePurchase}
+                  disabled={purchasing || !captchaToken}
+                  className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {purchasing ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Processing...
+                    </>
+                  ) : (
+                    'Confirm Purchase'
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </AnimatePresence>
   )
 }
