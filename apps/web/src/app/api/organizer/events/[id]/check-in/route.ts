@@ -100,12 +100,12 @@ export async function POST(
     const supabase = createServerClient()
 
     // Check if already checked in
-    const { data: existingCheckIn } = await supabase
+    const { data: existingCheckIn } = (await supabase
       .from('check_ins')
       .select('*')
       .eq('event_id', eventId)
       .eq('wallet_address', attendeeWallet)
-      .single()
+      .single()) as any
 
     if (existingCheckIn) {
       return NextResponse.json({
@@ -118,16 +118,16 @@ export async function POST(
     }
 
     // Create check-in record
-    const { data: checkIn, error } = await supabase
+    const { data: checkIn, error } = (await supabase
       .from('check_ins')
       .insert({
         event_id: eventId,
         ticket_id: ticketId ? BigInt(ticketId).toString() : null,
         wallet_address: attendeeWallet,
         checked_in_by: organizerWallet,
-      })
+      } as any)
       .select()
-      .single()
+      .single()) as any
 
     if (error) {
       console.error('Check-in error:', error)
@@ -138,12 +138,12 @@ export async function POST(
     }
 
     // Get attendee persona info if available
-    const { data: persona } = await supabase
+    const { data: persona } = (await supabase
       .from('event_personas')
       .select('display_name, interests, looking_for')
       .eq('event_id', eventId)
       .eq('wallet_address', attendeeWallet)
-      .single()
+      .single()) as any
 
     return NextResponse.json({
       success: true,
