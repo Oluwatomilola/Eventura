@@ -215,12 +215,12 @@ export async function GET(req: NextRequest) {
     }
 
     // Determine the other user's wallet
-    const otherWallet = connection.from_wallet === wallet
-      ? connection.to_wallet
-      : connection.from_wallet
+    const otherWallet = (connection as any).from_wallet === wallet
+      ? (connection as any).to_wallet
+      : (connection as any).from_wallet
 
     // Fetch messages between these two users
-    const { data: messages, error, count } = await supabase
+    const { data: messages, error, count } = (await supabase
       .from('messages')
       .select(`
         id,
@@ -237,7 +237,7 @@ export async function GET(req: NextRequest) {
       `, { count: 'exact' })
       .or(`and(from_wallet.eq.${wallet},to_wallet.eq.${otherWallet}),and(from_wallet.eq.${otherWallet},to_wallet.eq.${wallet})`)
       .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1)
+      .range(offset, offset + limit - 1)) as any
 
     if (error) {
       console.error('Database error:', error)
