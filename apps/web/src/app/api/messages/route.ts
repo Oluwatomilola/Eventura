@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert message
-    const { data: newMessage, error } = await supabase
+    const { data: newMessage, error } = (await supabase
       .from('messages')
       .insert({
         from_wallet: sanitizedInput.from_wallet,
@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
         read_at,
         created_at
       `)
-      .single()
+      .single()) as any
 
     if (error) {
       console.error('Database error:', error)
