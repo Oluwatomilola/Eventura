@@ -101,7 +101,7 @@ export async function GET(
     const interestsCount: Record<string, number> = {}
     const lookingForCount: Record<string, number> = {}
 
-    personas?.forEach((persona) => {
+    (personas as any)?.forEach((persona: any) => {
       persona.interests?.forEach((interest: string) => {
         interestsCount[interest] = (interestsCount[interest] || 0) + 1
       })

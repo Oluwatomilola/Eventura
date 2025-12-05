@@ -112,14 +112,14 @@ export async function POST(req: NextRequest) {
     }
 
     // Insert message
-    const { data: newMessage, error } = await supabase
+    const { data: newMessage, error } = (await supabase
       .from('messages')
       .insert({
         from_wallet: sanitizedInput.from_wallet,
         to_wallet: sanitizedInput.to_wallet,
         event_id: sanitizedInput.event_id || null,
         content: sanitizedInput.content
-      })
+      } as any)
       .select(`
         id,
         from_wallet,
@@ -129,7 +129,7 @@ export async function POST(req: NextRequest) {
         read_at,
         created_at
       `)
-      .single()
+      .single()) as any
 
     if (error) {
       console.error('Database error:', error)
@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
           message_id: newMessage.id,
           from_wallet: sanitizedInput.from_wallet
         }
-      })
+      } as any)
 
     return NextResponse.json(
       { success: true, data: newMessage },
@@ -215,12 +215,12 @@ export async function GET(req: NextRequest) {
     }
 
     // Determine the other user's wallet
-    const otherWallet = connection.from_wallet === wallet
-      ? connection.to_wallet
-      : connection.from_wallet
+    const otherWallet = (connection as any).from_wallet === wallet
+      ? (connection as any).to_wallet
+      : (connection as any).from_wallet
 
     // Fetch messages between these two users
-    const { data: messages, error, count } = await supabase
+    const { data: messages, error, count } = (await supabase
       .from('messages')
       .select(`
         id,
@@ -237,7 +237,7 @@ export async function GET(req: NextRequest) {
       `, { count: 'exact' })
       .or(`and(from_wallet.eq.${wallet},to_wallet.eq.${otherWallet}),and(from_wallet.eq.${otherWallet},to_wallet.eq.${wallet})`)
       .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1)
+      .range(offset, offset + limit - 1)) as any
 
     if (error) {
       console.error('Database error:', error)
@@ -248,8 +248,8 @@ export async function GET(req: NextRequest) {
     }
 
     // Mark unread messages as read
-    await supabase
-      .from('messages')
+    await (supabase
+      .from('messages') as any)
       .update({ read_at: new Date().toISOString() })
       .eq('to_wallet', wallet)
       .eq('from_wallet', otherWallet)

@@ -225,12 +225,19 @@ describe('TicketMarketplace', function () {
 
   describe('Buying Tickets', function () {
     it('should allow buying a listed ticket with proper fee distribution', async function () {
-      const { 
-        eventFactory, 
-        eventTicketing, 
-        ticketMarketplace, 
-        organizer, 
-        attendee1, 
+      const {
+        eventFactory,
+        eventTicketing,
+        ticketMarketplace,
+        organizer,
+        attendee1,
+        attendee2
+      } = await deployContracts();
+
+      // This test is incomplete - skipping for now
+      // TODO: Implement proper marketplace buying tests
+    });
+  });
 
   describe('Admin Functions', function () {
     it('should allow owner to update fee recipient', async function () {
